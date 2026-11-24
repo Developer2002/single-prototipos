@@ -5594,7 +5594,7 @@
           if (b) A.jump(b.dataset.k);
         });
         $("#wm").innerHTML = logo(30) + "<span>Single</span>";
-        $("#reset").addEventListener("click", () => {
+        $("#reset")?.addEventListener("click", () => {
           S = init();
           lastScr = null;
           setHash();
