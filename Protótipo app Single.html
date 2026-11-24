@@ -1,0 +1,5710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Protótipo app Single</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* VOICE everyday product mock-up, reviewed by the team that approved the Single flows
+   IDEA the Single time-clock app as it would ship, dressed in Bizneo's workspace language
+   PICTURE the phone itself, live and clickable, with a screen index beside it
+   COLOUR warm paper #F7F6F3 ground, navy ink #1E2941, pastel status fields (lime, butter, blush, lavender)
+   TYPE Nunito Sans 800 for titles and figures, Nunito Sans 400-700 for text
+   LAYOUT laptop: index column left, phone right; 720px: index above phone; phone: the app fills the screen */
+      :root {
+        color-scheme: light dark;
+        --pg: light-dark(#eceae4, #12172a);
+        --pg-ink: light-dark(#1e2941, #e9eaf0);
+        --pg-mut: light-dark(#5b6478, #a6acbf);
+        --pg-line: light-dark(#d9d5cc, #2b3253);
+        --pg-btn: light-dark(#ffffff, #1b2140);
+      }
+      :root[data-theme="light"] {
+        color-scheme: light;
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+        min-width: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--pg);
+        color: var(--pg-ink);
+        font: 16px/1.55 "Nunito Sans", system-ui, sans-serif;
+        overflow-x: clip;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      button:disabled {
+        cursor: default;
+        opacity: 0.55;
+      }
+      :focus-visible {
+        outline: 2px solid #3b4898;
+        outline-offset: 2px;
+      }
+      .wrap {
+        display: grid;
+        grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+        grid-template-areas: "intro stage" "nav stage";
+        column-gap: 48px;
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 24px max(4vw, 16px);
+        min-height: 100%;
+        align-items: start;
+      }
+      .intro {
+        grid-area: intro;
+      }
+      .navc {
+        grid-area: nav;
+        padding-bottom: 24px;
+      }
+      .side {
+        padding: 4px 2px;
+      }
+      .wm-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font: 800 20px/1 "Nunito Sans", sans-serif;
+      }
+      .side h1 {
+        font: 800 34px/1.05 "Nunito Sans", sans-serif;
+        letter-spacing: -0.02em;
+        margin: 22px 0 12px;
+        text-wrap: balance;
+      }
+      .side p {
+        margin: 0 0 10px;
+        color: var(--pg-mut);
+      }
+      .side .note {
+        font-size: 14px;
+      }
+      .navc .grp:first-child {
+        margin-top: 6px;
+      }
+      .grp {
+        margin-top: 18px;
+      }
+      .grp h2 {
+        font: 800 14px/1.2 "Nunito Sans", sans-serif;
+        margin: 0 0 8px;
+        color: var(--pg-ink);
+      }
+      .grp div {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .jb {
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1px solid var(--pg-line);
+        background: var(--pg-btn);
+        color: var(--pg-ink);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .jb.on {
+        background: var(--pg-ink);
+        border-color: var(--pg-ink);
+        color: var(--pg);
+      }
+      .reset {
+        margin-top: 20px;
+        height: 40px;
+        padding: 0 16px;
+        border-radius: 10px;
+        border: 1px solid var(--pg-ink);
+        background: transparent;
+        color: var(--pg-ink);
+        font: 700 14px "Nunito Sans", sans-serif;
+      }
+      .tok {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 22px;
+      }
+      .tok span {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font: 600 12px/1.3 "Nunito Sans", sans-serif;
+        color: var(--pg-mut);
+      }
+      .tok i {
+        display: block;
+        height: 28px;
+        border-radius: 8px;
+        border: 1px solid var(--pg-line);
+      }
+      .stage {
+        grid-area: stage;
+        display: flex;
+        justify-content: center;
+        position: sticky;
+        top: 24px;
+      }
+      .phone {
+        width: 390px;
+        height: min(844px, calc(100svh - 48px));
+        min-height: 620px;
+        border-radius: 52px;
+        background: #0c101d;
+        padding: 11px;
+        box-shadow: 0 30px 70px -34px rgba(12, 16, 29, 0.55),
+          0 0 0 1px light-dark(transparent, #2b3253);
+      }
+      .app {
+        --bg: #f7f6f3;
+        --sf: #ffffff;
+        --ink: #1e2941;
+        --mut: #5b6478;
+        --mut2: #8a90a0;
+        --line: #e7e3dc;
+        --line2: #e2e4e9;
+        --nv: #1e2941;
+        --ind: #3b4898;
+        --warm: #f1efea;
+        --lav: #edefff;
+        --lav2: #c4caff;
+        --g: #eff5d2;
+        --g2: #deecaa;
+        --gi: #4a6111;
+        --y: #fdf3c8;
+        --y2: #fbe68c;
+        --yi: #7a5b00;
+        --r: #fdecec;
+        --r2: #f6c9c9;
+        --ri: #a3262a;
+        --b: #e3eefc;
+        --b2: #ccdef9;
+        --bi: #2d5aa0;
+        --pe: #fdebd7;
+        --pe2: #fbd6ad;
+        --pei: #9a5212;
+        position: relative;
+        isolation: isolate;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border-radius: 41px;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.45 "Nunito Sans", system-ui, sans-serif;
+        color-scheme: light;
+      }
+      .sbar {
+        height: 46px;
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 28px 0 34px;
+        font: 800 15px "Nunito Sans", sans-serif;
+      }
+      .sbar span {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .scroll {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
+        overscroll-behavior: contain;
+      }
+      .pad {
+        padding: 4px 16px 28px;
+      }
+      .pt0 {
+        padding-top: 0;
+      }
+      .sp {
+        flex: 1;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 16px 8px;
+        min-height: 58px;
+      }
+      .top h1 {
+        flex: 1;
+        margin: 0;
+        font: 800 20px/1.2 "Nunito Sans", sans-serif;
+      }
+      .top.main h1 {
+        font-size: 26px;
+        letter-spacing: -0.01em;
+      }
+      .ib {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--line2);
+        background: var(--sf);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        flex: none;
+        padding: 0;
+        position: relative;
+      }
+      .ib.gh {
+        border-color: transparent;
+        background: transparent;
+      }
+      .ib.sm {
+        width: 34px;
+        height: 34px;
+      }
+      .ib.sq {
+        border-radius: 10px;
+      }
+      .ib.sq.on {
+        background: var(--nv);
+        border-color: var(--nv);
+        color: #fff;
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin: 0 -6px;
+      }
+      .badge {
+        position: absolute;
+        top: 3px;
+        right: 2px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 9px;
+        background: #d1343a;
+        color: #fff;
+        font: 800 11px/18px "Nunito Sans", sans-serif;
+        text-align: center;
+      }
+      .badge.s {
+        position: static;
+        margin-left: auto;
+      }
+      .av {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--pe2);
+        background: var(--pe);
+        color: var(--ink);
+        font: 800 14px "Nunito Sans", sans-serif;
+        display: grid;
+        place-items: center;
+        flex: none;
+        padding: 0;
+      }
+      .av.lg {
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
+      }
+      .date {
+        margin: 10px 0 0;
+        color: var(--mut);
+        font: 600 14px "Nunito Sans", sans-serif;
+      }
+      .hi {
+        margin: 0;
+        font: 800 28px/1.15 "Nunito Sans", sans-serif;
+        letter-spacing: -0.01em;
+      }
+      .sub {
+        margin: 0 0 10px;
+        color: var(--mut);
+        font: 600 14px/1.4 "Nunito Sans", sans-serif;
+      }
+      .sec-h {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 24px 0 10px;
+        min-height: 28px;
+      }
+      .sec-h h2 {
+        margin: 0;
+        font: 800 17px/1.2 "Nunito Sans", sans-serif;
+      }
+      .lnk {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 0;
+        background: none;
+        padding: 6px 0;
+        color: var(--ink);
+        font: 700 14px "Nunito Sans", sans-serif;
+        white-space: nowrap;
+      }
+      .lnk.sm {
+        font-size: 13px;
+        color: var(--ind);
+        padding: 0 0 0 8px;
+      }
+      .card {
+        background: var(--sf);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .btn {
+        height: 48px;
+        border-radius: 10px;
+        border: 1px solid var(--nv);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 18px;
+        font: 700 15px "Nunito Sans", sans-serif;
+        white-space: nowrap;
+      }
+      .btn.pri {
+        background: var(--nv);
+        color: #fff;
+      }
+      .btn.out {
+        background: var(--sf);
+        color: var(--nv);
+      }
+      .btn.gh {
+        background: transparent;
+        border-color: transparent;
+        color: var(--nv);
+      }
+      .btn.lt {
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border-color: var(--line2);
+        background: var(--sf);
+        color: var(--nv);
+        font-size: 13px;
+      }
+      .btn.blk {
+        width: 100%;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .mt {
+        margin-top: 12px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        height: 26px;
+        padding: 0 10px;
+        border: 1px solid var(--line2);
+        border-radius: 999px;
+        background: var(--sf);
+        color: var(--mut);
+        font: 700 12px "Nunito Sans", sans-serif;
+        white-space: nowrap;
+      }
+      .chip.lk {
+        background: var(--warm);
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        height: 24px;
+        padding: 0 9px;
+        border-radius: 999px;
+        border-width: 1px;
+        border-style: solid;
+        font: 700 12px "Nunito Sans", sans-serif;
+        white-space: nowrap;
+        flex: none;
+      }
+      .pill::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      .g {
+        --tb: var(--g);
+        --tl: var(--g2);
+        --ti: var(--gi);
+      }
+      .y {
+        --tb: var(--y);
+        --tl: var(--y2);
+        --ti: var(--yi);
+      }
+      .r {
+        --tb: var(--r);
+        --tl: var(--r2);
+        --ti: var(--ri);
+      }
+      .l {
+        --tb: var(--lav);
+        --tl: var(--lav2);
+        --ti: var(--ind);
+      }
+      .b {
+        --tb: var(--b);
+        --tl: var(--b2);
+        --ti: var(--bi);
+      }
+      .pe {
+        --tb: var(--pe);
+        --tl: var(--pe2);
+        --ti: var(--pei);
+      }
+      .n {
+        --tb: var(--warm);
+        --tl: #e2ded6;
+        --ti: var(--mut);
+      }
+      .pill,
+      .ico,
+      .banner,
+      .shift,
+      .wk-b {
+        background: var(--tb);
+        border-color: var(--tl);
+        color: var(--ti);
+      }
+      .ico {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border-width: 1px;
+        border-style: solid;
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+      .db {
+        display: inline-flex;
+        flex-direction: column;
+        width: 44px;
+        flex: none;
+        border: 1px solid var(--line2);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fff;
+        text-align: center;
+      }
+      .db b {
+        background: var(--nv);
+        color: #fff;
+        font: 700 12px/18px "Nunito Sans", sans-serif;
+      }
+      .db span {
+        font: 800 18px/26px "Nunito Sans", sans-serif;
+        color: var(--ink);
+      }
+      .li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px 14px;
+        border: 0;
+        background: none;
+        color: inherit;
+        text-align: left;
+        min-height: 60px;
+      }
+      .li + .li,
+      .li + .arow,
+      .arow + .arow,
+      .arow + .li {
+        border-top: 1px solid #f0ede8;
+      }
+      button.li:hover,
+      .pr-main:hover,
+      .ar-main:hover {
+        background: #fbfaf8;
+      }
+      .li > svg {
+        color: var(--mut2);
+        flex: none;
+      }
+      .li-t {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+      .li-t b {
+        font: 700 15px/1.3 "Nunito Sans", sans-serif;
+      }
+      .li-t b.rd {
+        font-weight: 600;
+        color: #3a445c;
+      }
+      .li-t small {
+        color: var(--mut);
+        font: 600 13px/1.35 "Nunito Sans", sans-serif;
+      }
+      .li-r {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        flex: none;
+      }
+      .li-r small {
+        color: var(--mut2);
+        font: 600 12px "Nunito Sans", sans-serif;
+        white-space: nowrap;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--ind);
+      }
+      .neg {
+        color: var(--ri) !important;
+      }
+      .pos {
+        color: var(--gi) !important;
+      }
+      .li.dis {
+        opacity: 0.7;
+      }
+      .li.danger b {
+        color: var(--ri);
+      }
+      .tcard {
+        padding: 16px 16px 14px;
+      }
+      .tm {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 6px;
+      }
+      .tm svg {
+        align-self: center;
+        color: var(--mut);
+      }
+      .tm b {
+        font: 800 42px/1 "Nunito Sans", sans-serif;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+      .tm small {
+        width: 22px;
+        font: 800 17px "Nunito Sans", sans-serif;
+        color: var(--mut);
+        font-variant-numeric: tabular-nums;
+      }
+      .tm-l {
+        text-align: center;
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+        margin: 2px 0 10px;
+      }
+      .ctr {
+        text-align: center;
+      }
+      .shift {
+        display: block;
+        margin: 14px 0;
+        padding: 10px 12px;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 10px;
+        text-align: center;
+      }
+      .shift b {
+        display: block;
+        color: var(--ink);
+        font: 800 16px/1.3 "Nunito Sans", sans-serif;
+      }
+      .shift span {
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .cap {
+        margin: 10px 0 0;
+        text-align: center;
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .week {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        margin: 0 -16px;
+        padding: 0 16px 6px;
+        scroll-padding: 0 16px;
+        scrollbar-width: none;
+      }
+      .wk {
+        flex: 0 0 138px;
+        scroll-snap-align: start;
+        padding: 10px;
+      }
+      .wk-h {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 8px;
+      }
+      .wk-h b {
+        font: 800 13px "Nunito Sans", sans-serif;
+      }
+      .wk-h small {
+        color: var(--mut2);
+        font: 700 12px "Nunito Sans", sans-serif;
+      }
+      .wk-b {
+        display: block;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 8px;
+        padding: 8px;
+        text-align: center;
+      }
+      .wk-b b {
+        display: block;
+        color: var(--ink);
+        font: 800 16px "Nunito Sans", sans-serif;
+        font-variant-numeric: tabular-nums;
+      }
+      .wk-b span {
+        color: var(--mut);
+        font: 600 12px "Nunito Sans", sans-serif;
+        white-space: nowrap;
+      }
+      .wk-s {
+        margin: 8px 0;
+        color: var(--mut);
+        font: 600 12px "Nunito Sans", sans-serif;
+        text-align: center;
+      }
+      .wk.today {
+        border-color: var(--nv);
+      }
+      .fbar {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        margin: 0 -16px;
+        padding: 2px 16px 4px;
+        scrollbar-width: none;
+      }
+      .fchip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--line2);
+        border-radius: 999px;
+        background: var(--sf);
+        color: var(--ink);
+        font: 700 13px "Nunito Sans", sans-serif;
+        white-space: nowrap;
+        flex: none;
+      }
+      .banner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        margin: 12px 0 0;
+        padding: 12px 14px;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 12px;
+        text-align: left;
+        font: 700 14px/1.35 "Nunito Sans", sans-serif;
+      }
+      .banner span {
+        flex: 1;
+        color: var(--ink);
+      }
+      .banner > b {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .banner.col {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+      }
+      .banner.col span {
+        font-weight: 600;
+      }
+      .day {
+        margin-top: 12px;
+        overflow: visible;
+      }
+      .day-h {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 6px 10px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .day-t {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .day-t b {
+        font: 800 16px "Nunito Sans", sans-serif;
+      }
+      .day-t small {
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .prow,
+      .arow {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding-right: 6px;
+      }
+      .prow + .prow {
+        border-top: 1px solid #f0ede8;
+      }
+      .pr-main,
+      .ar-main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 58px;
+        padding: 10px 4px 10px 12px;
+        border: 0;
+        background: none;
+        color: inherit;
+        text-align: left;
+      }
+      .t {
+        width: 50px;
+        flex: none;
+        font: 800 17px "Nunito Sans", sans-serif;
+        font-variant-numeric: tabular-nums;
+      }
+      .pr-t {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .pr-t span {
+        font: 700 14px "Nunito Sans", sans-serif;
+      }
+      .pr-t small {
+        color: var(--mut);
+        font: 600 12px "Nunito Sans", sans-serif;
+      }
+      .rec .t,
+      .rec .pr-t span {
+        color: var(--mut2);
+        text-decoration: line-through;
+      }
+      .pop {
+        position: absolute;
+        right: 8px;
+        top: 48px;
+        z-index: 30;
+        min-width: 214px;
+        padding: 6px;
+        background: #fff;
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        box-shadow: 0 14px 30px -10px rgba(30, 41, 65, 0.3);
+      }
+      .pop button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        height: 44px;
+        padding: 0 10px;
+        border: 0;
+        border-radius: 8px;
+        background: none;
+        color: var(--ink);
+        font: 700 14px "Nunito Sans", sans-serif;
+        text-align: left;
+      }
+      .pop button:hover {
+        background: var(--bg);
+      }
+      .pop p {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: 8px 10px;
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .scrim0 {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+      }
+      .empty {
+        margin-top: 14px;
+        padding: 22px;
+        text-align: center;
+      }
+      .empty p {
+        color: var(--mut);
+        margin: 4px 0 14px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .stats > div {
+        padding: 12px 14px;
+      }
+      .stats > div:nth-child(odd) {
+        border-right: 1px solid var(--line);
+      }
+      .stats > div:nth-child(n + 3) {
+        border-top: 1px solid var(--line);
+      }
+      .stats.s3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .stats.s3 > div {
+        border: 0;
+      }
+      .stats.s3 > div + div {
+        border-left: 1px solid var(--line);
+      }
+      .stats small {
+        display: block;
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .stats b {
+        display: block;
+        font: 800 21px/1.25 "Nunito Sans", sans-serif;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .tl {
+        padding: 4px 0;
+      }
+      .tl-i {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-height: 54px;
+        padding: 8px 12px;
+        border: 0;
+        background: none;
+        color: inherit;
+        text-align: left;
+        position: relative;
+      }
+      .tl-d {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex: none;
+        border: 2px solid var(--tl);
+        background: var(--ti);
+      }
+      .tl-i:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        left: 17px;
+        top: 38px;
+        height: 32px;
+        width: 2px;
+        background: var(--line2);
+      }
+      .none {
+        margin: 0;
+        padding: 14px;
+        color: var(--mut);
+      }
+      .acts {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .acts .btn {
+        padding: 0 6px;
+        font-size: 14px;
+        gap: 5px;
+      }
+      .bd {
+        padding: 16px;
+      }
+      .bd-t {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .bd-t > b {
+        font: 800 44px/1 "Nunito Sans", sans-serif;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em;
+      }
+      .bd-t > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+      }
+      .bd-tp {
+        font: 800 16px "Nunito Sans", sans-serif;
+      }
+      .map {
+        position: relative;
+        height: 124px;
+        margin: 16px 0 6px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+      .map svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .map-t {
+        position: absolute;
+        left: 8px;
+        bottom: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--line2);
+        font: 700 12px "Nunito Sans", sans-serif;
+      }
+      .kv {
+        padding: 0 2px;
+      }
+      .card.kv {
+        padding: 2px 14px;
+      }
+      .kv-r {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 0;
+        font: 600 14px "Nunito Sans", sans-serif;
+      }
+      .kv-r + .kv-r {
+        border-top: 1px solid #f0ede8;
+      }
+      .kv-r > span {
+        color: var(--mut);
+        flex: none;
+      }
+      .kv-r > b {
+        font-weight: 700;
+        text-align: right;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: flex-end;
+      }
+      .fn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .hd {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+      }
+      .pad-c {
+        padding: 16px;
+      }
+      .steps {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .steps li {
+        position: relative;
+        display: flex;
+        gap: 12px;
+        padding: 0 0 18px;
+      }
+      .steps li:last-child {
+        padding-bottom: 0;
+      }
+      .steps li::before {
+        content: "";
+        position: absolute;
+        left: 11px;
+        top: 26px;
+        bottom: 2px;
+        width: 2px;
+        background: var(--line2);
+      }
+      .steps li:last-child::before {
+        display: none;
+      }
+      .steps i {
+        width: 24px;
+        height: 24px;
+        flex: none;
+        border-radius: 50%;
+        border: 2px solid #c9c3b8;
+        background: #fff;
+        display: grid;
+        place-items: center;
+        color: #fff;
+      }
+      .steps .done i {
+        background: var(--nv);
+        border-color: var(--nv);
+      }
+      .steps .done::before {
+        background: var(--nv);
+      }
+      .steps .cur i {
+        background: #f2c230;
+        border-color: #d9a400;
+        box-shadow: inset 0 0 0 4px #fff;
+      }
+      .steps .ok i {
+        background: #5e8a0e;
+        border-color: #5e8a0e;
+      }
+      .steps .bad i {
+        background: var(--ri);
+        border-color: var(--ri);
+      }
+      .steps div {
+        display: flex;
+        flex-direction: column;
+      }
+      .steps b {
+        font: 700 15px/1.3 "Nunito Sans", sans-serif;
+      }
+      .steps small {
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .sal {
+        padding: 14px;
+      }
+      .sal-t {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 12px;
+      }
+      .sal-t small {
+        display: block;
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .sal-t b {
+        font: 800 30px/1.1 "Nunito Sans", sans-serif;
+      }
+      .sal-t .r2 {
+        text-align: right;
+      }
+      .sal-t .m {
+        font-size: 17px;
+      }
+      .bar2 {
+        height: 10px;
+        margin: 12px 0 8px;
+        border-radius: 5px;
+        background: var(--warm);
+        border: 1px solid var(--line);
+        overflow: hidden;
+      }
+      .bar2 i {
+        display: block;
+        height: 100%;
+        background: var(--nv);
+        border-radius: 5px;
+      }
+      .mut {
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .fcard {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        color: inherit;
+        text-align: left;
+      }
+      .fc-h {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .fcard .shift {
+        margin: 12px 0;
+      }
+      .mini {
+        display: flex;
+      }
+      .mini span {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: var(--mut);
+        font: 700 12px "Nunito Sans", sans-serif;
+      }
+      .mini span::before {
+        content: "";
+        position: absolute;
+        top: 5px;
+        left: -50%;
+        right: 50%;
+        height: 2px;
+        background: var(--line2);
+      }
+      .mini span:first-child::before {
+        display: none;
+      }
+      .mini i {
+        position: relative;
+        z-index: 1;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #c9c3b8;
+        background: #fff;
+      }
+      .mini .d {
+        color: var(--ink);
+      }
+      .mini .d i {
+        background: var(--nv);
+        border-color: var(--nv);
+      }
+      .mini .d::before {
+        background: var(--nv);
+      }
+      .mini .c i {
+        background: #f2c230;
+        border-color: #d9a400;
+      }
+      .form .fl {
+        margin-top: 16px;
+      }
+      .fl {
+        display: block;
+        margin-top: 16px;
+      }
+      .lb {
+        display: block;
+        margin-bottom: 6px;
+        font: 700 14px "Nunito Sans", sans-serif;
+      }
+      .lb em {
+        font-style: normal;
+        font-weight: 600;
+        color: var(--mut);
+      }
+      .inp {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 48px;
+        padding: 0 12px;
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--mut);
+      }
+      .inp input {
+        flex: 1;
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--ink);
+        font: 600 16px "Nunito Sans", sans-serif;
+      }
+      .inp:focus-within,
+      textarea:focus {
+        border-color: var(--ind);
+        box-shadow: 0 0 0 3px var(--lav);
+        outline: 0;
+      }
+      textarea {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--ink);
+        font: 500 16px/1.4 "Nunito Sans", sans-serif;
+        resize: vertical;
+      }
+      .cnt {
+        display: block;
+        text-align: right;
+        color: var(--mut2);
+        font: 600 12px "Nunito Sans", sans-serif;
+        margin-top: 4px;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .two .fl {
+        margin-top: 16px;
+      }
+      .seg {
+        display: flex;
+        gap: 3px;
+        padding: 3px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--warm);
+      }
+      .seg button {
+        flex: 1;
+        height: 38px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--mut);
+        font: 700 14px "Nunito Sans", sans-serif;
+      }
+      .seg button.on {
+        background: #fff;
+        color: var(--ink);
+        font-weight: 800;
+        box-shadow: 0 1px 2px rgba(30, 41, 65, 0.14);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .ch {
+        height: 38px;
+        padding: 0 14px;
+        border: 1px solid var(--line2);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--ink);
+        font: 700 14px "Nunito Sans", sans-serif;
+      }
+      .ch.on {
+        background: var(--nv);
+        border-color: var(--nv);
+        color: #fff;
+      }
+      .drop {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        width: 100%;
+        padding: 20px 14px;
+        border: 1.5px dashed #c9c3b8;
+        border-radius: 12px;
+        background: #fbfaf8;
+        color: var(--ink);
+      }
+      .drop b {
+        font: 800 15px "Nunito Sans", sans-serif;
+      }
+      .drop small {
+        color: var(--mut);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      .drop.bad {
+        border-color: #e59a9a;
+        background: var(--r);
+      }
+      .att {
+        margin-bottom: 8px;
+      }
+      .att-r {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 10px 10px 12px;
+      }
+      .att-r + .att-r {
+        border-top: 1px solid #f0ede8;
+      }
+      .att-r .ico {
+        border-radius: 10px;
+      }
+      .fnm {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .drop.sm {
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+      }
+      .drop.sm small {
+        display: none;
+      }
+      .err {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin: 12px 0 0;
+        color: var(--ri);
+        font: 700 14px/1.35 "Nunito Sans", sans-serif;
+      }
+      .err svg {
+        flex: none;
+        margin-top: 1px;
+      }
+      .rules {
+        margin-top: 18px;
+        padding: 12px 14px;
+      }
+      .rules summary {
+        font: 800 14px "Nunito Sans", sans-serif;
+        cursor: pointer;
+      }
+      .rules ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: var(--mut);
+        font: 600 13px/1.5 "Nunito Sans", sans-serif;
+      }
+      .wheel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px;
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        background: #fff;
+      }
+      .wcol {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 86px;
+      }
+      .wcol button {
+        width: 100%;
+        height: 28px;
+        border: 0;
+        border-radius: 8px;
+        background: none;
+        color: var(--mut2);
+        font: 700 14px "Nunito Sans", sans-serif;
+        font-variant-numeric: tabular-nums;
+      }
+      .wcol .o1 {
+        height: 34px;
+        color: var(--mut);
+        font-size: 18px;
+      }
+      .wcol .cur {
+        height: 50px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--ink);
+        font: 800 30px "Nunito Sans", sans-serif;
+      }
+      .colon {
+        font: 800 28px "Nunito Sans", sans-serif;
+      }
+      .foot {
+        flex: none;
+        display: grid;
+        gap: 8px;
+        padding: 12px 16px;
+        background: var(--sf);
+        border-top: 1px solid var(--line);
+      }
+      .foot .two {
+        gap: 8px;
+      }
+      .tabs {
+        flex: none;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        padding: 6px 8px 12px;
+        background: var(--sf);
+        border-top: 1px solid var(--line);
+      }
+      .tabs button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        padding: 4px 0;
+        border: 0;
+        background: none;
+        color: var(--mut2);
+        font: 700 12px "Nunito Sans", sans-serif;
+      }
+      .tabs i {
+        display: grid;
+        place-items: center;
+        width: 46px;
+        height: 32px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+      }
+      .tabs .on {
+        color: var(--nv);
+        font-weight: 800;
+      }
+      .tabs .on i {
+        background: var(--bg);
+        border-color: var(--line2);
+      }
+      .scrim {
+        position: absolute;
+        inset: 0;
+        z-index: 40;
+        background: rgba(30, 41, 65, 0.4);
+        animation: fd 0.2s ease-out;
+      }
+      .sheet {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 41;
+        display: flex;
+        flex-direction: column;
+        max-height: 90%;
+        background: var(--sf);
+        border-radius: 22px 22px 0 0;
+        animation: up 0.26s ease-out;
+      }
+      .grab {
+        width: 40px;
+        height: 4px;
+        margin: 8px auto 0;
+        border-radius: 2px;
+        background: #d9d5cc;
+        flex: none;
+      }
+      .sh-h {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px 6px;
+        min-height: 52px;
+        flex: none;
+      }
+      .sh-h h2 {
+        flex: 1;
+        margin: 0;
+        font: 800 19px/1.25 "Nunito Sans", sans-serif;
+      }
+      .sh-h.c h2 {
+        text-align: center;
+      }
+      .sh-b {
+        overflow-y: auto;
+        padding: 2px 16px 16px;
+      }
+      .sh-b > .card {
+        margin-top: 4px;
+      }
+      .sh-f {
+        display: grid;
+        gap: 6px;
+        padding: 12px 16px 16px;
+        border-top: 1px solid var(--line);
+        flex: none;
+      }
+      .drawer {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 41;
+        width: 86%;
+        max-width: 322px;
+        display: flex;
+        flex-direction: column;
+        background: var(--sf);
+        border-radius: 0 22px 22px 0;
+        animation: sl 0.26s ease-out;
+      }
+      .dr-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 54px 16px 10px;
+      }
+      .wm {
+        font: 800 20px "Nunito Sans", sans-serif;
+      }
+      .dr-prof {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 6px 12px 4px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg);
+        color: inherit;
+        text-align: left;
+      }
+      .dr-b {
+        flex: 1;
+        overflow-y: auto;
+        padding: 4px 12px;
+      }
+      .dr-s {
+        margin: 16px 6px 6px;
+        color: var(--mut2);
+        font: 800 13px "Nunito Sans", sans-serif;
+      }
+      .dr-i {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 8px 6px;
+        border: 0;
+        border-radius: 10px;
+        background: none;
+        color: inherit;
+        text-align: left;
+      }
+      .dr-i:hover {
+        background: var(--bg);
+      }
+      .dr-ic {
+        width: 38px;
+        height: 38px;
+        flex: none;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--ink);
+      }
+      .dr-i.on .dr-ic {
+        background: var(--nv);
+        border-color: var(--nv);
+        color: #fff;
+      }
+      .dr-i.on b {
+        color: var(--nv);
+      }
+      .dr-out {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 8px 12px 18px;
+        padding: 12px 10px;
+        border: 0;
+        border-top: 1px solid var(--line);
+        background: none;
+        color: var(--ri);
+        font: 800 15px "Nunito Sans", sans-serif;
+      }
+      .toast {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: 86px;
+        z-index: 70;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 10px 12px 14px;
+        border-radius: 12px;
+        background: var(--nv);
+        color: #fff;
+        font: 700 14px/1.35 "Nunito Sans", sans-serif;
+        box-shadow: 0 14px 30px -12px rgba(30, 41, 65, 0.5);
+        animation: up 0.22s ease-out;
+      }
+      .toast span {
+        flex: 1;
+      }
+      .toast button {
+        border: 0;
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
+        border-radius: 8px;
+        height: 34px;
+        padding: 0 12px;
+        font: 800 13px "Nunito Sans", sans-serif;
+      }
+      .comp {
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg);
+        animation: fd 0.2s ease-out;
+      }
+      .comp-b {
+        flex: 1;
+        overflow-y: auto;
+        padding: 56px 20px 20px;
+        text-align: center;
+      }
+      .okp {
+        padding: 22px 20px 24px;
+        text-align: center;
+      }
+      .okc {
+        width: 76px;
+        height: 76px;
+        margin: 12px auto 14px;
+        border-radius: 50%;
+        border: 1px solid var(--g2);
+        background: var(--g);
+        color: var(--gi);
+        display: grid;
+        place-items: center;
+      }
+      .okp h1,
+      .comp h1 {
+        margin: 0 0 4px;
+        font: 800 26px/1.15 "Nunito Sans", sans-serif;
+      }
+      .okp > p,
+      .comp-b > p {
+        max-width: 300px;
+        margin: 0 auto 18px;
+        color: var(--mut);
+      }
+      .comp .big {
+        margin: 0 0 8px;
+        color: var(--ink);
+        font: 800 36px/1.1 "Nunito Sans", sans-serif;
+      }
+      .okp .card,
+      .comp .card {
+        text-align: left;
+      }
+      .okp .card + .card {
+        margin-top: 12px;
+      }
+      .spin {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2.5px solid rgba(255, 255, 255, 0.35);
+        border-top-color: #fff;
+        animation: rot 0.8s linear infinite;
+      }
+      .c {
+        text-align: center;
+      }
+      .login {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .lg-art {
+        position: relative;
+        height: 250px;
+        flex: none;
+        overflow: hidden;
+      }
+      .lg-art > svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .flt {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        box-shadow: 0 12px 26px -14px rgba(30, 41, 65, 0.45);
+      }
+      .flt .li-t b {
+        font-size: 14px;
+      }
+      .f1 {
+        left: 22px;
+        top: 60px;
+      }
+      .f2 {
+        right: 18px;
+        top: 150px;
+      }
+      .lg-body {
+        padding: 6px 24px 24px;
+      }
+      .lg-body h1 {
+        margin: 16px 0 4px;
+        font: 800 28px/1.15 "Nunito Sans", sans-serif;
+      }
+      .forgot {
+        display: block;
+        margin: 10px 0 18px;
+        border: 0;
+        background: none;
+        padding: 4px 0;
+        color: var(--ind);
+        font: 700 14px "Nunito Sans", sans-serif;
+      }
+      .prof {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px;
+      }
+      .prof .li-t b {
+        font-size: 18px;
+      }
+      .tg {
+        cursor: pointer;
+      }
+      .tg input {
+        position: absolute;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+      }
+      .sw {
+        width: 46px;
+        height: 28px;
+        flex: none;
+        border-radius: 14px;
+        background: #d9d5cc;
+        position: relative;
+        transition: background 0.2s;
+      }
+      .sw::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(30, 41, 65, 0.3);
+        transition: transform 0.2s;
+      }
+      .tg input:checked + .sw {
+        background: var(--nv);
+      }
+      .tg input:checked + .sw::after {
+        transform: translateX(18px);
+      }
+      .tg input:focus-visible + .sw {
+        outline: 2px solid var(--ind);
+        outline-offset: 2px;
+      }
+      .ver {
+        margin: 18px 0 0;
+        text-align: center;
+        color: var(--mut2);
+        font: 600 13px "Nunito Sans", sans-serif;
+      }
+      @keyframes up {
+        from {
+          transform: translateY(24px);
+          opacity: 0;
+        }
+        to {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      @keyframes sl {
+        from {
+          transform: translateX(-30px);
+          opacity: 0;
+        }
+        to {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      @keyframes fd {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes rot {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+      @media (max-width: 900px) {
+        .wrap {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto;
+          grid-template-areas: "intro" "stage" "nav";
+          row-gap: 20px;
+        }
+        .stage {
+          position: static;
+        }
+        .side h1 {
+          font-size: 30px;
+          margin-top: 16px;
+        }
+        .tok {
+          grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 600px) {
+        .wrap {
+          display: block;
+          height: 100%;
+          padding: 0;
+        }
+        .side {
+          display: none;
+        }
+        .stage {
+          height: 100%;
+        }
+        .phone {
+          width: 100%;
+          height: 100%;
+          min-height: 0;
+          padding: 0;
+          border-radius: 0;
+          background: none;
+          box-shadow: none;
+        }
+        .app {
+          border-radius: 0;
+        }
+        .sbar {
+          display: none;
+        }
+        .top {
+          padding-top: 10px;
+        }
+        .dr-top {
+          padding-top: 18px;
+        }
+        .comp-b {
+          padding-top: 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="side intro">
+        <div class="wm-row" id="wm"></div>
+        <h1>Protótipo do app Single</h1>
+      </header>
+      <aside class="side navc" aria-label="Telas do protótipo">
+        <nav id="idx" aria-label="Ir para a tela"></nav>
+        <div class="tok" aria-label="Base visual">
+          <span><i style="background: #f7f6f3"></i>Fundo</span>
+          <span><i style="background: #1e2941"></i>Tinta</span>
+          <span><i style="background: #3b4898"></i>Índigo</span>
+          <span><i style="background: #eff5d2"></i>Aprovado</span>
+          <span><i style="background: #fdf3c8"></i>Análise</span>
+          <span><i style="background: #fdecec"></i>Recusado</span>
+          <span><i style="background: #edefff"></i>Info</span>
+        </div>
+      </aside>
+      <main class="stage">
+        <div class="phone"><div class="app" id="app"></div></div>
+      </main>
+    </div>
+    <script>
+      {
+        const $ = (s) => document.querySelector(s);
+        const pad = (n) => (n < 10 ? "0" : "") + n;
+        const esc = (s) =>
+          String(s == null ? "" : s).replace(
+            /[&<>"']/g,
+            (c) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              }[c])
+          );
+        const clone = (x) => JSON.parse(JSON.stringify(x));
+        const MON = [
+          "jan",
+          "fev",
+          "mar",
+          "abr",
+          "mai",
+          "jun",
+          "jul",
+          "ago",
+          "set",
+          "out",
+          "nov",
+          "dez",
+        ];
+        const MONL = [
+          "Janeiro",
+          "Fevereiro",
+          "Março",
+          "Abril",
+          "Maio",
+          "Junho",
+          "Julho",
+          "Agosto",
+          "Setembro",
+          "Outubro",
+          "Novembro",
+          "Dezembro",
+        ];
+        const HOL = [
+          "01/01",
+          "21/04",
+          "01/05",
+          "07/09",
+          "12/10",
+          "02/11",
+          "15/11",
+          "20/11",
+          "25/12",
+        ];
+        const toD = (dmy) => {
+          const p = (dmy || "").split("/").map(Number);
+          return p.length === 3 && p[0] && p[1] && p[2]
+            ? new Date(p[2], p[1] - 1, p[0])
+            : null;
+        };
+        const fromD = (d) =>
+          pad(d.getDate()) +
+          "/" +
+          pad(d.getMonth() + 1) +
+          "/" +
+          d.getFullYear();
+        const addDays = (dmy, n) => {
+          const d = toD(dmy);
+          if (!d) return "";
+          d.setDate(d.getDate() + n);
+          return fromD(d);
+        };
+        const isOff = (d) =>
+          d.getDay() === 0 ||
+          d.getDay() === 6 ||
+          HOL.indexOf(fromD(d).slice(0, 5)) >= 0;
+        const nextWork = (dmy) => {
+          const d = toD(dmy);
+          if (!d) return "";
+          while (isOff(d)) d.setDate(d.getDate() + 1);
+          return fromD(d);
+        };
+        const TODAY = new Date(2026, 10, 19);
+
+        const pth = (...a) => a.map((x) => '<path d="' + x + '"/>').join("");
+        const P = {
+          menu: pth("M4 6h16", "M4 12h16", "M4 18h16"),
+          bell: pth(
+            "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9",
+            "M10.3 21a1.94 1.94 0 0 0 3.4 0"
+          ),
+          chevL: pth("m15 18-6-6 6-6"),
+          chevR: pth("m9 18 6-6-6-6"),
+          chevD: pth("m6 9 6 6 6-6"),
+          plus: pth("M12 5v14", "M5 12h14"),
+          x: pth("M18 6 6 18", "M6 6l12 12"),
+          clock: '<circle cx="12" cy="12" r="9"/>' + pth("M12 7v5l3 2"),
+          clip:
+            '<rect x="8" y="2" width="8" height="4" rx="1"/>' +
+            pth(
+              "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2",
+              "M12 11h4",
+              "M12 16h4",
+              "M8 11h.01",
+              "M8 16h.01"
+            ),
+          steth:
+            pth(
+              "M11 2v2",
+              "M5 2v2",
+              "M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1",
+              "M8 15a6 6 0 0 0 12 0v-3"
+            ) + '<circle cx="20" cy="10" r="2"/>',
+          file: pth(
+            "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z",
+            "M14 2v4a2 2 0 0 0 2 2h4",
+            "M9 13h6",
+            "M9 17h4"
+          ),
+          sun:
+            '<circle cx="12" cy="12" r="4"/>' +
+            pth(
+              "M12 2v2",
+              "M12 20v2",
+              "m4.93 4.93 1.41 1.41",
+              "m17.66 17.66 1.41 1.41",
+              "M2 12h2",
+              "M20 12h2",
+              "m6.34 17.66-1.41 1.41",
+              "m19.07 4.93-1.41 1.41"
+            ),
+          user:
+            pth("M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2") +
+            '<circle cx="12" cy="7" r="4"/>',
+          home: pth(
+            "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"
+          ),
+          filter: pth(
+            "M21 4h-7",
+            "M10 4H3",
+            "M21 12h-9",
+            "M8 12H3",
+            "M21 20h-5",
+            "M12 20H3",
+            "M14 2v4",
+            "M8 10v4",
+            "M16 18v4"
+          ),
+          more: '<circle cx="12" cy="5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="19" r="1.3" fill="currentColor"/>',
+          lock:
+            '<rect x="4" y="11" width="16" height="10" rx="2"/>' +
+            pth("M8 11V7a4 4 0 0 1 8 0v4"),
+          pin:
+            pth("M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z") +
+            '<circle cx="12" cy="10" r="3"/>',
+          check: pth("M20 6 9 17l-5-5"),
+          alert:
+            '<circle cx="12" cy="12" r="10"/>' + pth("M12 8v4", "M12 16h.01"),
+          camera:
+            pth(
+              "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"
+            ) + '<circle cx="12" cy="13" r="3"/>',
+          calendar:
+            '<rect x="3" y="4" width="18" height="18" rx="2"/>' +
+            pth("M16 2v4", "M8 2v4", "M3 10h18"),
+          building:
+            '<rect x="4" y="2" width="16" height="20" rx="2"/>' +
+            pth(
+              "M9 22v-4h6v4",
+              "M8 6h.01",
+              "M16 6h.01",
+              "M12 6h.01",
+              "M12 10h.01",
+              "M12 14h.01",
+              "M16 10h.01",
+              "M16 14h.01",
+              "M8 10h.01",
+              "M8 14h.01"
+            ),
+          logout: pth(
+            "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4",
+            "m16 17 5-5-5-5",
+            "M21 12H9"
+          ),
+          login: pth(
+            "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4",
+            "m10 17 5-5-5-5",
+            "M15 12H3"
+          ),
+          help:
+            '<circle cx="12" cy="12" r="10"/>' +
+            pth("M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3", "M12 17h.01"),
+          share: pth(
+            "M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8",
+            "m16 6-4-4-4 4",
+            "M12 2v13"
+          ),
+          edit: pth("M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"),
+          inbox: pth(
+            "M22 12h-6l-2 3h-4l-2-3H2",
+            "M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+          ),
+          arrowR: pth("M5 12h14", "m12 5 7 7-7 7"),
+          eye:
+            pth("M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z") +
+            '<circle cx="12" cy="12" r="3"/>',
+          download: pth(
+            "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",
+            "M7 10l5 5 5-5",
+            "M12 15V3"
+          ),
+          phone:
+            '<rect x="6" y="2" width="12" height="20" rx="2"/>' +
+            pth("M12 18h.01"),
+          fp: pth(
+            "M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4",
+            "M14 13.12c0 2.38 0 6.38-1 8.88",
+            "M17.29 21.02c.12-.6.43-2.3.5-3.02",
+            "M2 12a10 10 0 0 1 18-6",
+            "M2 16h.01",
+            "M21.8 16c.2-2 .131-5.354 0-6",
+            "M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2",
+            "M8.65 22c.21-.66.45-1.32.57-2",
+            "M9 6.8a6 6 0 0 1 9 5.2v2"
+          ),
+          map: pth(
+            "M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z",
+            "M15 5.764v15",
+            "M9 3.236v15"
+          ),
+          list: pth(
+            "M8 6h13",
+            "M8 12h13",
+            "M8 18h13",
+            "M3 6h.01",
+            "M3 12h.01",
+            "M3 18h.01"
+          ),
+          image:
+            '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/>' +
+            pth("m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"),
+        };
+        const ic = (n, s = 20, w = 1.8) =>
+          '<svg width="' +
+          s +
+          '" height="' +
+          s +
+          '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' +
+          w +
+          '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          P[n] +
+          "</svg>";
+        const logo = (s) =>
+          '<svg width="' +
+          s +
+          '" height="' +
+          s +
+          '" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1E2941"/><circle cx="16" cy="16" r="8.5" fill="none" stroke="#fff" stroke-width="3"/><path d="M16 11.5V16l3 2" stroke="#C4CAFF" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg>';
+
+        /* ---------- dados de exemplo (do protótipo aprovado) ---------- */
+        const LOC = "R. Gen. Glicério, Araçatuba";
+        const BASE = [
+          {
+            id: "19",
+            wd: "Quinta",
+            wds: "Qui",
+            n: "19",
+            d: "19 nov",
+            ds: "19/11",
+            total: "",
+            locked: false,
+            rows: [
+              {
+                id: "19a",
+                t: "08:02",
+                tipo: "Entrada",
+                o: "app",
+                s: "ok",
+                nsr: "000180",
+              },
+              {
+                id: "19b",
+                t: "12:01",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000181",
+              },
+              {
+                id: "19c",
+                t: "13:00",
+                tipo: "Entrada",
+                o: "app",
+                s: "pend",
+                nsr: "—",
+              },
+            ],
+          },
+          {
+            id: "18",
+            wd: "Quarta",
+            wds: "Qua",
+            n: "18",
+            d: "18 nov",
+            ds: "18/11",
+            total: "7h 53",
+            locked: false,
+            rows: [
+              {
+                id: "18a",
+                t: "08:05",
+                tipo: "Entrada",
+                o: "app",
+                s: "ok",
+                nsr: "000176",
+              },
+              {
+                id: "18b",
+                t: "12:00",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000177",
+              },
+              {
+                id: "18c",
+                t: "13:02",
+                tipo: "Entrada",
+                o: "app",
+                s: "ok",
+                nsr: "000178",
+              },
+              {
+                id: "18d",
+                t: "17:00",
+                tipo: "Saída",
+                o: "manual",
+                s: "ana",
+                nsr: "—",
+              },
+            ],
+          },
+          {
+            id: "17",
+            wd: "Terça",
+            wds: "Ter",
+            n: "17",
+            d: "17 nov",
+            ds: "17/11",
+            total: "8h 31",
+            locked: false,
+            rows: [
+              {
+                id: "17a",
+                t: "08:00",
+                tipo: "Entrada",
+                o: "manual",
+                s: "apr",
+                before: "08:31",
+                nsr: "000172",
+              },
+              {
+                id: "17b",
+                t: "12:00",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000173",
+              },
+              {
+                id: "17c",
+                t: "13:00",
+                tipo: "Entrada",
+                o: "app",
+                s: "err",
+                nsr: "—",
+              },
+              {
+                id: "17d",
+                t: "17:31",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000175",
+              },
+            ],
+          },
+          {
+            id: "16",
+            wd: "Segunda",
+            wds: "Seg",
+            n: "16",
+            d: "16 nov",
+            ds: "16/11",
+            total: "7h 59",
+            locked: false,
+            rows: [
+              {
+                id: "16x",
+                t: "07:40",
+                tipo: "Entrada",
+                o: "manual",
+                s: "rec",
+                nsr: "—",
+              },
+              {
+                id: "16a",
+                t: "08:03",
+                tipo: "Entrada",
+                o: "app",
+                s: "ok",
+                nsr: "000168",
+              },
+              {
+                id: "16b",
+                t: "12:00",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000169",
+              },
+              {
+                id: "16c",
+                t: "13:00",
+                tipo: "Entrada",
+                o: "app",
+                s: "ok",
+                nsr: "000170",
+              },
+              {
+                id: "16d",
+                t: "17:02",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000171",
+              },
+            ],
+          },
+          {
+            id: "14",
+            wd: "Sexta",
+            wds: "Sex",
+            n: "14",
+            d: "14 nov",
+            ds: "14/11",
+            total: "8h 00",
+            locked: true,
+            rows: [
+              {
+                id: "14a",
+                t: "08:00",
+                tipo: "Entrada",
+                o: "app",
+                s: "ok",
+                nsr: "000164",
+              },
+              {
+                id: "14b",
+                t: "12:00",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000165",
+              },
+              {
+                id: "14c",
+                t: "13:00",
+                tipo: "Entrada",
+                o: "app",
+                s: "ok",
+                nsr: "000166",
+              },
+              {
+                id: "14d",
+                t: "17:00",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000167",
+              },
+            ],
+          },
+          {
+            id: "13",
+            wd: "Quinta",
+            wds: "Qui",
+            n: "13",
+            d: "13 nov",
+            ds: "13/11",
+            total: "8h 00",
+            locked: true,
+            rows: [
+              {
+                id: "13a",
+                t: "08:10",
+                tipo: "Entrada",
+                o: "app",
+                s: "ok",
+                nsr: "000160",
+              },
+              {
+                id: "13b",
+                t: "12:05",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000161",
+              },
+              {
+                id: "13c",
+                t: "13:05",
+                tipo: "Entrada",
+                o: "manual",
+                s: "apr",
+                before: "13:20",
+                nsr: "000162",
+              },
+              {
+                id: "13d",
+                t: "17:10",
+                tipo: "Saída",
+                o: "app",
+                s: "ok",
+                nsr: "000163",
+              },
+            ],
+          },
+        ];
+        const DAYX = {
+          18: {
+            prev: "8h 00",
+            saldo: "−0h 07",
+            int: "1h 02",
+            occ: ["Saída incluída manualmente · em análise"],
+          },
+          17: {
+            prev: "8h 00",
+            saldo: "+0h 31",
+            int: "1h 00",
+            occ: [
+              "Entrada corrigida de 08:31 para 08:00 · aprovada",
+              "1 batida com erro de envio",
+            ],
+          },
+          16: {
+            prev: "8h 00",
+            saldo: "−0h 01",
+            int: "1h 00",
+            occ: ["Inclusão de 07:40 recusada"],
+          },
+          14: { prev: "8h 00", saldo: "0h 00", int: "1h 00", occ: [] },
+          13: {
+            prev: "8h 00",
+            saldo: "0h 00",
+            int: "55 min",
+            occ: ["Intervalo menor que 1h"],
+          },
+        };
+        const WDL = {
+          19: "Quinta, 19 de novembro",
+          18: "Quarta, 18 de novembro",
+          17: "Terça, 17 de novembro",
+          16: "Segunda, 16 de novembro",
+          14: "Sexta, 14 de novembro",
+          13: "Quinta, 13 de novembro",
+        };
+        const INITREQ = [
+          {
+            id: "q1",
+            kind: "Inclusão",
+            desc: "Saída · 18/11 às 17:00",
+            s: "ana",
+            when: "Enviada em 18/11",
+          },
+          {
+            id: "q2",
+            kind: "Correção",
+            desc: "Entrada · 17/11 · 08:31 → 08:00",
+            s: "apr",
+            when: "Aprovada em 18/11",
+          },
+          {
+            id: "q3",
+            kind: "Inclusão",
+            desc: "Entrada · 16/11 às 07:40",
+            s: "rec",
+            when: "Recusada em 17/11",
+          },
+        ];
+        const MOTIVOS = [
+          "Esqueci de registrar",
+          "Problema no app",
+          "Trabalho externo",
+          "Outro",
+        ];
+        const ABTIPOS = [
+          "Doação de sangue",
+          "Comparecimento judicial",
+          "Falecimento na família",
+          "Casamento",
+          "Outro",
+        ];
+        const ATS = [
+          {
+            id: "a3",
+            per: "03/11",
+            dias: 1,
+            files: [
+              { n: "atestado_0311.jpg", size: 1258291, x: "jpg" },
+              {
+                n: "declaracao_comparecimento_0311.pdf",
+                size: 212992,
+                x: "pdf",
+              },
+            ],
+            s: "ana",
+            sent: "Enviado em 18/11",
+            prazo: "23/11",
+            obs: "",
+          },
+          {
+            id: "a1",
+            per: "10/11 a 11/11",
+            dias: 2,
+            files: [
+              { n: "atestado_1011.pdf", size: 364544, x: "pdf" },
+              { n: "receita_1011.jpg", size: 1006632, x: "jpg" },
+            ],
+            s: "apr",
+            sent: "Enviado em 10/11 · aprovado em 12/11",
+            obs: "Consulta e repouso",
+          },
+          {
+            id: "a2",
+            per: "28/10",
+            dias: 1,
+            files: [{ n: "IMG_2210.jpg", size: 2516582, x: "jpg" }],
+            s: "rec",
+            sent: "Enviado em 28/10 · recusado em 29/10",
+            obs: "",
+            motivo: "A imagem está ilegível. Envie uma nova foto do atestado.",
+            curto: "Imagem ilegível",
+          },
+          {
+            id: "a4",
+            per: "22/09",
+            dias: 1,
+            files: [{ n: "atestado_2209.jpg", size: 1153434, x: "jpg" }],
+            s: "apr",
+            sent: "Enviado em 22/09 · aprovado em 23/09",
+            obs: "",
+          },
+          {
+            id: "a5",
+            per: "05/08 a 07/08",
+            dias: 3,
+            files: [
+              { n: "atestado_0508.pdf", size: 430080, x: "pdf" },
+              { n: "exame_hemograma.pdf", size: 624640, x: "pdf" },
+              { n: "receita_0508.png", size: 890880, x: "png" },
+            ],
+            s: "apr",
+            sent: "Enviado em 05/08 · aprovado em 06/08",
+            obs: "",
+          },
+        ];
+        const FER = [
+          {
+            id: "f1",
+            ini: "15/12/2026",
+            fim: "24/12/2026",
+            dias: 10,
+            s: "apr",
+            sent: "Aprovada em 05/11",
+            vender: false,
+            adiant: true,
+          },
+          {
+            id: "fr",
+            ini: "14/07/2026",
+            fim: "18/07/2026",
+            dias: 5,
+            s: "rec",
+            sent: "Recusada em 20/06",
+            vender: false,
+            adiant: false,
+            motivo:
+              "O período coincide com o fechamento semestral. Escolha outra data.",
+          },
+          {
+            id: "f0",
+            ini: "06/01/2026",
+            fim: "15/01/2026",
+            dias: 10,
+            s: "done",
+            sent: "Período aquisitivo 2024/2025",
+            vender: false,
+            adiant: false,
+          },
+        ];
+        const NOTS = [
+          {
+            id: "n2",
+            t: "Registre sua saída",
+            d: "Sua jornada terminou às 17:00.",
+            w: "Agora",
+            i: "clock",
+            k: "l",
+          },
+          {
+            id: "n1",
+            t: "Atestado de 10/11 a 11/11 aprovado",
+            d: "2 dias abonados no ponto.",
+            w: "Hoje, 09:12",
+            i: "steth",
+            k: "g",
+          },
+          {
+            id: "n3",
+            t: "Batida de 17/11 não foi enviada",
+            d: "Toque para ver no Ponto.",
+            w: "Ontem",
+            i: "clip",
+            k: "y",
+          },
+          {
+            id: "n4",
+            t: "Férias de 15/12 aprovadas",
+            d: "Aviso e recibo disponíveis.",
+            w: "05/11",
+            i: "sun",
+            k: "b",
+            old: true,
+          },
+          {
+            id: "n5",
+            t: "Atestado de 28/10 recusado",
+            d: "A imagem está ilegível.",
+            w: "29/10",
+            i: "steth",
+            k: "r",
+            old: true,
+          },
+        ];
+
+        const init = () => ({
+          scr: "inicio",
+          hist: [],
+          sheet: null,
+          drawer: false,
+          menu: null,
+          toast: null,
+          comp: null,
+          days: clone(BASE),
+          reqs: clone(INITREQ),
+          ats: clone(ATS),
+          fers: clone(FER),
+          nread: {},
+          fPer: "mes",
+          fOrig: "all",
+          fStat: "all",
+          fIni: "01/11/2026",
+          fFim: "19/11/2026",
+          sec: 28865,
+          punches: 0,
+          pTipo: "Saída",
+          pLoading: false,
+          sel: "17a",
+          rday: "17",
+          atSel: "a1",
+          ferSel: "f1",
+          atLast: null,
+          ferLast: null,
+          atWasEdit: false,
+          ed: null,
+          ab: null,
+          at: null,
+          fer: null,
+          pk: {},
+          prefs: { bio: true, lemb: true, mapa: true },
+        });
+        let S = init(),
+          tt = 0,
+          lastScr = null,
+          DL = null;
+        try {
+          if (window.claude && typeof window.claude.use === "function")
+            window.claude
+              .use("downloads")
+              .then((d) => {
+                DL = d;
+              })
+              .catch(() => {});
+        } catch (e) {}
+
+        /* ---------- regras ---------- */
+        const live = (r) => r.s !== "rec";
+        const dayOf = (id) => S.days.find((d) => d.id === id);
+        const today = () => dayOf("19");
+        const findRow = (id) => {
+          for (const d of S.days)
+            for (const r of d.rows) if (r.id === id) return { d, r };
+          return null;
+        };
+        const running = () => {
+          const r = today().rows.filter(live);
+          return r.length > 0 && r[r.length - 1].tipo === "Entrada";
+        };
+        const lastT = () => {
+          const r = today().rows.filter(live);
+          return r[r.length - 1].t;
+        };
+        const hm = (s) =>
+          Math.floor(s / 3600) + ":" + pad(Math.floor((s % 3600) / 60));
+        const fmtHM = (s) =>
+          Math.floor(s / 3600) + "h " + pad(Math.floor((s % 3600) / 60));
+        const nowT = () =>
+          ["17:03", "17:05", "17:07", "17:09", "17:11"][Math.min(S.punches, 4)];
+        const dayTotal = (d) =>
+          d.id === "19" ? (running() ? "em andamento" : fmtHM(S.sec)) : d.total;
+        const saldo = () =>
+          30 -
+          S.fers
+            .filter((f) => f.s === "apr" || f.s === "ana")
+            .reduce((a, f) => a + f.dias, 0);
+        const pendN = () => S.reqs.filter((q) => q.s === "ana").length;
+        const dl = (n) => (n === 1 ? "1 dia" : n + " dias");
+        const TONE = {
+          ok: "g",
+          apr: "g",
+          pend: "y",
+          ana: "y",
+          err: "r",
+          rec: "r",
+          done: "n",
+        };
+        const lab = (s, m) =>
+          ({
+            ok: "Enviada",
+            pend: "Pendente",
+            err: "Com erro",
+            ana: "Em análise",
+            apr: m ? "Aprovado" : "Aprovada",
+            rec: m ? "Recusado" : "Recusada",
+            done: "Concluídas",
+          }[s]);
+        const pill = (s, m) =>
+          '<span class="pill ' + TONE[s] + '">' + lab(s, m) + "</span>";
+        const db = (dm) => {
+          const p = dm.split("/");
+          return (
+            '<span class="db" aria-hidden="true"><b>' +
+            MON[+p[1] - 1] +
+            "</b><span>" +
+            +p[0] +
+            "</span></span>"
+          );
+        };
+        const nots = () =>
+          NOTS.map((n) =>
+            Object.assign({}, n, { unread: !n.old && !S.nread[n.id] })
+          );
+        const curAt = () => S.ats.find((a) => a.id === S.atSel) || S.ats[0];
+        const curFer = () => S.fers.find((f) => f.id === S.ferSel) || S.fers[0];
+        const PER = {
+          hoje: "Hoje",
+          d7: "Últimos 7 dias",
+          mes: "1 – 19 nov",
+          outro: "Período personalizado",
+        };
+        const ORIG = {
+          all: "App e manual",
+          app: "Só app",
+          manual: "Só manual",
+        };
+        const STATS = [
+          ["all", "Todos"],
+          ["ok", "Enviada"],
+          ["pend", "Pendente"],
+          ["err", "Com erro"],
+          ["ana", "Em análise"],
+          ["apr", "Aprovada"],
+          ["rec", "Recusada"],
+        ];
+        const filtered = () =>
+          S.days
+            .filter((d) => S.fPer !== "hoje" || d.id === "19")
+            .map((d) =>
+              Object.assign({}, d, {
+                rows: d.rows.filter(
+                  (r) =>
+                    (S.fOrig === "all" || r.o === S.fOrig) &&
+                    (S.fStat === "all" || r.s === S.fStat)
+                ),
+              })
+            )
+            .filter((d) => d.rows.length);
+        const pushReq = (kind, desc) =>
+          S.reqs.unshift({
+            id: "q" + Date.now(),
+            kind,
+            desc,
+            s: "ana",
+            when: "Enviada agora",
+          });
+
+        /* ---------- peças ---------- */
+        const hdr = (t, right) =>
+          '<header class="top"><button class="ib" onclick="A.back()" aria-label="Voltar">' +
+          ic("chevL") +
+          "</button><h1>" +
+          t +
+          "</h1>" +
+          (right || "") +
+          "</header>";
+        const secH = (t, r) =>
+          '<div class="sec-h"><h2>' + t + "</h2>" + (r || "") + "</div>";
+        const lnk = (t, f) =>
+          '<button class="lnk" onclick="' +
+          f +
+          '">' +
+          t +
+          " " +
+          ic("arrowR", 16) +
+          "</button>";
+        const kv = (k, v) =>
+          '<div class="kv-r"><span>' + k + "</span><b>" + v + "</b></div>";
+        const segB = (l, on, f) =>
+          '<button class="' +
+          (on ? "on" : "") +
+          '" aria-pressed="' +
+          on +
+          '" onclick="' +
+          f +
+          '">' +
+          l +
+          "</button>";
+        const chB = (l, on, f) =>
+          '<button class="ch ' +
+          (on ? "on" : "") +
+          '" aria-pressed="' +
+          on +
+          '" onclick="' +
+          f +
+          '">' +
+          l +
+          "</button>";
+        const liB = (i, t, l, s, f) =>
+          '<button class="li" onclick="' +
+          f +
+          '"><span class="ico ' +
+          t +
+          '">' +
+          ic(i, 18) +
+          '</span><span class="li-t"><b>' +
+          l +
+          "</b>" +
+          (s ? "<small>" + s + "</small>" : "") +
+          "</span>" +
+          ic("chevR", 18) +
+          "</button>";
+        const field = (id, l, v, o, ch, icn) =>
+          '<label class="fl" for="' +
+          id +
+          '"><span class="lb">' +
+          l +
+          '</span><span class="inp">' +
+          ic(icn || "calendar", 18) +
+          '<input id="' +
+          id +
+          '" value="' +
+          esc(v) +
+          '" inputmode="numeric" oninput="' +
+          o +
+          '"' +
+          (ch ? ' onchange="' + ch + '"' : "") +
+          "></span></label>";
+        const steps = (a) =>
+          '<ol class="steps">' +
+          a
+            .map(
+              (x) =>
+                '<li class="' +
+                x[2] +
+                '"><i>' +
+                (x[2] === "done" || x[2] === "ok"
+                  ? ic("check", 13, 3)
+                  : x[2] === "bad"
+                  ? ic("x", 13, 3)
+                  : "") +
+                "</i><div><b>" +
+                x[0] +
+                "</b>" +
+                (x[1] ? "<small>" + x[1] + "</small>" : "") +
+                "</div></li>"
+            )
+            .join("") +
+          "</ol>";
+        const notifRow = (n) =>
+          '<button class="li" onclick="A.openNotif(\'' +
+          n.id +
+          '\')"><span class="ico ' +
+          n.k +
+          '">' +
+          ic(n.i, 18) +
+          '</span><span class="li-t"><b class="' +
+          (n.unread ? "" : "rd") +
+          '">' +
+          n.t +
+          "</b><small>" +
+          n.d +
+          '</small></span><span class="li-r"><small>' +
+          n.w +
+          "</small>" +
+          (n.unread ? '<i class="dot" aria-label="não lida"></i>' : "") +
+          "</span></button>";
+        const mapSvg = () =>
+          '<div class="map"><svg viewBox="0 0 340 124" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="340" height="124" fill="#EEEDE6"/><path d="M-10 96 C60 74 120 112 190 88 S300 62 360 76" stroke="#CCDEF9" stroke-width="16" fill="none"/><rect x="16" y="12" width="74" height="38" rx="8" fill="#DEECAA"/><rect x="236" y="90" width="84" height="30" rx="8" fill="#DEECAA"/><g stroke="#fff" stroke-width="7" fill="none"><path d="M0 62H340"/><path d="M118 0V124"/><path d="M226 0V124"/><path d="M0 22 340 40"/></g><circle cx="172" cy="56" r="30" fill="#3B4898" fill-opacity=".12" stroke="#3B4898" stroke-opacity=".35"/><path d="M172 66c0 0-12-11-12-20a12 12 0 0 1 24 0c0 9-12 20-12 20z" fill="#1E2941"/><circle cx="172" cy="46" r="4.5" fill="#fff"/></svg><span class="map-t">' +
+          ic("pin", 14) +
+          " No local · ±8 m</span></div>";
+        const rowSmall = (r) =>
+          (r.o === "manual" ? "Manual" : "App") +
+          (r.before ? " · antes <s>" + r.before + "</s>" : "");
+        /* ---------- anexos: vários por atestado, cada um baixável ---------- */
+        const MAXF = 5,
+          MAXB = 10 * 1048576;
+        const fsize = (b) =>
+          b >= 1048576
+            ? (b / 1048576).toFixed(1).replace(".", ",") + " MB"
+            : Math.max(1, Math.round(b / 1024)) + " KB";
+        const nArq = (n) => (n === 1 ? "1 arquivo" : n + " arquivos");
+        const attRow = (f, dl, rm) =>
+          '<div class="att-r"><span class="ico ' +
+          (f.x === "pdf" ? "r" : "b") +
+          '">' +
+          ic(f.x === "pdf" ? "file" : "image", 18) +
+          '</span><span class="li-t"><b class="fnm">' +
+          esc(f.n) +
+          "</b><small>" +
+          f.x.toUpperCase() +
+          " · " +
+          fsize(f.size) +
+          "</small></span>" +
+          (rm
+            ? '<button class="ib sm" onclick="' +
+              dl +
+              '" aria-label="Baixar ' +
+              esc(f.n) +
+              '">' +
+              ic("download", 16) +
+              '</button><button class="ib sm" onclick="' +
+              rm +
+              '" aria-label="Remover ' +
+              esc(f.n) +
+              '">' +
+              ic("x", 16) +
+              "</button>"
+            : '<button class="btn lt" onclick="' +
+              dl +
+              '" aria-label="Baixar ' +
+              esc(f.n) +
+              '">' +
+              ic("download", 16) +
+              " Baixar</button>") +
+          "</div>";
+        function samplePdf(name) {
+          const q = (t) =>
+            t.replace(/[^\x20-\x7E]/g, "").replace(/([()\\])/g, "\\$1");
+          const c =
+            "BT /F1 22 Tf 60 770 Td (Documento de exemplo) Tj /F1 13 Tf 0 -30 Td (" +
+            q(name) +
+            ") Tj 0 -20 Td (Prototipo Single - nao e um atestado real.) Tj ET";
+          const o = [
+            "<< /Type /Catalog /Pages 2 0 R >>",
+            "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+            "<< /Length " + c.length + " >>\nstream\n" + c + "\nendstream",
+          ];
+          let out = "%PDF-1.4\n";
+          const off = [];
+          o.forEach((x, i) => {
+            off.push(out.length);
+            out += i + 1 + " 0 obj\n" + x + "\nendobj\n";
+          });
+          const xr = out.length;
+          out +=
+            "xref\n0 " +
+            (o.length + 1) +
+            "\n0000000000 65535 f \n" +
+            off
+              .map((v) => String(v).padStart(10, "0") + " 00000 n \n")
+              .join("") +
+            "trailer\n<< /Size " +
+            (o.length + 1) +
+            " /Root 1 0 R >>\nstartxref\n" +
+            xr +
+            "\n%%EOF";
+          return new Blob([out], { type: "application/pdf" });
+        }
+        function sampleImg(f) {
+          return new Promise((res) => {
+            const c = document.createElement("canvas");
+            c.width = 900;
+            c.height = 1200;
+            const g = c.getContext("2d");
+            g.fillStyle = "#fff";
+            g.fillRect(0, 0, 900, 1200);
+            g.fillStyle = "#1E2941";
+            g.font = "700 46px sans-serif";
+            g.fillText("Documento de exemplo", 70, 140);
+            g.fillStyle = "#5B6478";
+            g.font = "400 28px sans-serif";
+            g.fillText(f.n, 70, 196);
+            g.fillText("Protótipo Single · não é um atestado real", 70, 240);
+            g.fillStyle = "#EDEFFF";
+            for (let i = 0; i < 9; i++)
+              g.fillRect(70, 330 + i * 72, i % 3 === 2 ? 440 : 760, 26);
+            g.save();
+            g.translate(450, 930);
+            g.rotate(-0.35);
+            g.fillStyle = "rgba(59,72,152,.14)";
+            g.font = "800 150px sans-serif";
+            g.textAlign = "center";
+            g.fillText("EXEMPLO", 0, 0);
+            g.restore();
+            c.toBlob(
+              (b) => res(b),
+              f.x === "png" ? "image/png" : "image/jpeg",
+              0.9
+            );
+          });
+        }
+        async function dlFile(f) {
+          if (!f) return;
+          const blob =
+            f.file || (f.x === "pdf" ? samplePdf(f.n) : await sampleImg(f));
+          if (DL) {
+            try {
+              const r = await DL.save({ filename: f.n, data: blob });
+              if (r && r.status === "saved") A.toast("Arquivo baixado: " + f.n);
+            } catch (e) {
+              const c = e && e.code;
+              if (c === "declined") return;
+              A.toast(
+                c === "rejected_extension" || c === "extension_not_enabled"
+                  ? "Este formato não pode ser baixado aqui."
+                  : c === "rate_limited"
+                  ? "Conclua o download anterior e tente de novo."
+                  : "Não foi possível baixar agora. Tente de novo."
+              );
+            }
+            return;
+          }
+          const u = URL.createObjectURL(blob),
+            el = document.createElement("a");
+          el.href = u;
+          el.download = f.n;
+          document.body.appendChild(el);
+          el.click();
+          el.remove();
+          setTimeout(() => URL.revokeObjectURL(u), 5000);
+          A.toast("Download iniciado: " + f.n);
+        }
+
+        /* ---------- telas ---------- */
+        const SCR = {};
+        SCR.entrar = () =>
+          '<div class="login"><div class="lg-art"><svg viewBox="0 0 390 250" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><rect width="390" height="250" fill="#F7F6F3"/><path d="M0 0H390V170C320 230 250 140 170 190S40 250 0 210Z" fill="#EDEFFF"/><circle cx="330" cy="40" r="70" fill="#C4CAFF" opacity=".55"/><circle cx="40" cy="210" r="26" fill="#FBE68C" opacity=".7"/></svg>' +
+          '<div class="card flt f1"><span class="ico g">' +
+          ic("check", 18, 2.4) +
+          '</span><span class="li-t"><b>Entrada registrada</b><small>08:02 · no local</small></span></div>' +
+          '<div class="card flt f2"><span class="ico b">' +
+          ic("sun", 18) +
+          '</span><span class="li-t"><b>Férias aprovadas</b><small>15/12 a 24/12</small></span></div></div>' +
+          '<div class="lg-body"><div class="wm-row">' +
+          logo(34) +
+          '<span>Single</span></div><h1>Bem-vindo ao Single</h1><p class="sub">Registre seu ponto e acompanhe suas solicitações.</p>' +
+          field("lg-u", "Usuário", "ana.costa", "", null, "user") +
+          '<label class="fl" for="lg-p"><span class="lb">Senha</span><span class="inp">' +
+          ic("lock", 18) +
+          '<input id="lg-p" type="password" value="exemplo123" autocomplete="current-password"></span></label>' +
+          '<button class="forgot" onclick="A.toast(\'Enviamos um link de redefinição para o seu e-mail.\')">Esqueci minha senha</button>' +
+          '<button class="btn pri blk" onclick="A.login()">Entrar</button></div></div>';
+
+        SCR.inicio = () => {
+          const run = running(),
+            n = nots().filter((x) => x.unread).length,
+            rows = today().rows.filter(live);
+          return (
+            '<div class="pad"><div class="bar"><button class="ib gh" onclick="A.openDrawer()" aria-label="Abrir menu">' +
+            ic("menu", 22) +
+            '</button><span class="sp"></span>' +
+            '<button class="ib gh" onclick="A.go(\'notificacoes\')" aria-label="Notificações, ' +
+            n +
+            ' novas">' +
+            ic("bell", 22) +
+            (n ? '<span class="badge">' + n + "</span>" : "") +
+            "</button>" +
+            '<button class="av" onclick="A.tab(\'perfil\')" aria-label="Perfil de Ana Costa">AC</button></div>' +
+            '<p class="date">Quinta, 19 de novembro</p><h1 class="hi">Olá, Ana 👋</h1>' +
+            secH(
+              "Jornada de hoje",
+              '<button class="ib gh sm" onclick="A.go(\'resumo-do-dia\',{rday:\'19\'})" aria-label="Resumo do dia">' +
+                ic("more", 18) +
+                "</button>"
+            ) +
+            '<div class="card tcard"><div class="tm">' +
+            ic("building", 20) +
+            '<b id="tmhm">' +
+            hm(S.sec) +
+            '</b><small id="tms">' +
+            pad(S.sec % 60) +
+            '</small></div><p class="tm-l">horas trabalhadas hoje</p>' +
+            '<div class="ctr"><span class="chip">' +
+            (run
+              ? "Entrada " + rows[0].t + " · intervalo 59 min"
+              : "Saída registrada às " + lastT()) +
+            "</span></div>" +
+            '<div class="shift g"><b>08:00 – 17:00</b><span>Jornada de 44h semanais · intervalo de 1h</span></div>' +
+            '<button class="btn ' +
+            (run ? "pri" : "out") +
+            ' blk" onclick="A.openPonto()">' +
+            ic(run ? "logout" : "login", 18) +
+            " " +
+            (run ? "Registrar saída" : "Registrar entrada") +
+            "</button>" +
+            '<p class="cap">' +
+            (run
+              ? "Sua jornada prevista terminou às 17:00."
+              : "Jornada encerrada. Bom descanso!") +
+            "</p></div>" +
+            secH("Minha semana", lnk("Ver ponto", "A.tab('ponto')")) +
+            '<div class="week" id="week">' +
+            weekCards() +
+            "</div>" +
+            secH("Acesso rápido") +
+            '<div class="card">' +
+            quick() +
+            "</div>" +
+            secH("Avisos", lnk("Ver todos", "A.go('notificacoes')")) +
+            '<div class="card">' +
+            nots().slice(0, 3).map(notifRow).join("") +
+            "</div></div>"
+          );
+        };
+        function weekCards() {
+          const c = ["16", "17", "18", "19"].map((id) => {
+            const d = dayOf(id),
+              rows = d.rows.filter(live),
+              iss = rows.filter(
+                (r) => r.s === "pend" || r.s === "ana" || r.s === "err"
+              ).length,
+              isT = id === "19",
+              run = isT && running(),
+              last = rows[rows.length - 1];
+            const tone = run ? "l" : iss ? "y" : "g";
+            return (
+              '<div class="wk card' +
+              (isT ? " today" : "") +
+              '"><div class="wk-h"><b>' +
+              d.wds.toUpperCase() +
+              " " +
+              d.n +
+              "</b><small>" +
+              (isT ? "Hoje" : "nov") +
+              "</small></div>" +
+              '<div class="wk-b ' +
+              tone +
+              '"><b>' +
+              (run ? hm(S.sec) + " h" : dayTotal(d)) +
+              "</b><span>" +
+              rows[0].t +
+              " – " +
+              (last.tipo === "Saída" ? last.t : "agora") +
+              "</span></div>" +
+              '<p class="wk-s">' +
+              (run
+                ? "Em andamento"
+                : iss
+                ? iss === 1
+                  ? "1 pendência"
+                  : iss + " pendências"
+                : "Jornada completa") +
+              "</p>" +
+              "<button class=\"btn lt blk\" onclick=\"A.go('resumo-do-dia',{rday:'" +
+              id +
+              "'})\">Ver dia</button></div>"
+            );
+          });
+          c.push(
+            '<div class="wk card"><div class="wk-h"><b>SEX 20</b><small>Amanhã</small></div><div class="wk-b n"><b>Feriado</b><span>Consciência Negra</span></div><p class="wk-s">Sem jornada prevista</p><button class="btn lt blk" disabled>Ver dia</button></div>'
+          );
+          return c.join("");
+        }
+        function quick() {
+          const nA = S.ats.filter((a) => a.s === "ana").length;
+          return (
+            liB(
+              "clip",
+              "y",
+              "Ponto",
+              today().rows.length + " batidas hoje",
+              "A.tab('ponto')"
+            ) +
+            liB(
+              "steth",
+              "g",
+              "Atestados médicos",
+              nA ? nA + " em análise" : "Nenhum em análise",
+              "A.go('atestados')"
+            ) +
+            liB(
+              "sun",
+              "b",
+              "Férias",
+              saldo() + " dias disponíveis",
+              "A.go('ferias')"
+            ) +
+            liB(
+              "user",
+              "pe",
+              "Perfil",
+              "Dados, matrícula e preferências",
+              "A.tab('perfil')"
+            )
+          );
+        }
+        SCR.notificacoes = () => {
+          const L = nots(),
+            u = L.some((n) => n.unread);
+          return (
+            hdr(
+              "Notificações",
+              u
+                ? '<button class="lnk sm" onclick="A.readAll()">Marcar como lidas</button>'
+                : ""
+            ) +
+            '<div class="pad pt0">' +
+            secH("Novas") +
+            '<div class="card">' +
+            L.filter((n) => !n.old)
+              .map(notifRow)
+              .join("") +
+            "</div>" +
+            secH("Anteriores") +
+            '<div class="card">' +
+            L.filter((n) => n.old)
+              .map(notifRow)
+              .join("") +
+            "</div></div>"
+          );
+        };
+
+        SCR.ponto = () => {
+          const vis = filtered(),
+            fa = S.fOrig !== "all" || S.fStat !== "all" || S.fPer !== "mes",
+            pn = pendN(),
+            stl = STATS.find((x) => x[0] === S.fStat)[1];
+          return (
+            '<header class="top main"><h1>Ponto</h1><button class="btn lt" onclick="A.openChooser()">' +
+            ic("plus", 16) +
+            ' Solicitar</button></header><div class="pad pt0">' +
+            '<div class="fbar"><button class="fchip" onclick="A.openFilter()">' +
+            ic("calendar", 16) +
+            " " +
+            PER[S.fPer] +
+            " " +
+            ic("chevD", 14) +
+            '</button><button class="fchip" onclick="A.openFilter()">' +
+            stl +
+            " · " +
+            ORIG[S.fOrig] +
+            '</button><button class="ib sq' +
+            (fa ? " on" : "") +
+            '" onclick="A.openFilter()" aria-label="Filtros' +
+            (fa ? " ativos" : "") +
+            '">' +
+            ic("filter", 18) +
+            "</button></div>" +
+            (pn
+              ? '<button class="banner y" onclick="A.openReqs()">' +
+                ic("clock", 18) +
+                "<span>" +
+                (pn === 1
+                  ? "1 solicitação em análise"
+                  : pn + " solicitações em análise") +
+                "</span><b>Ver</b></button>"
+              : "") +
+            (vis.length
+              ? vis.map(dayCard).join("")
+              : '<div class="card empty"><b>Nenhuma batida encontrada</b><p>Tente outro período, origem ou status.</p><button class="btn out" onclick="A.clearF()">Limpar filtros</button></div>') +
+            "</div>"
+          );
+        };
+        function dayCard(d) {
+          const tot = dayTotal(d);
+          return (
+            '<article class="card day"><div class="day-h">' +
+            db(d.ds) +
+            '<div class="day-t"><b>' +
+            d.wd +
+            "</b><small>" +
+            (tot === "em andamento"
+              ? "Jornada em andamento"
+              : tot + " trabalhadas") +
+            " · " +
+            d.rows.length +
+            " batidas</small></div>" +
+            (d.locked
+              ? '<span class="chip lk">' + ic("lock", 13) + " Fechado</span>"
+              : "") +
+            '<button class="ib gh sm" onclick="A.dayMenu(\'' +
+            d.id +
+            '\')" aria-label="Opções de ' +
+            d.wd +
+            ", " +
+            d.ds +
+            '">' +
+            ic("more", 18) +
+            "</button></div>" +
+            d.rows.map((r) => rowH(r, d)).join("") +
+            "</article>"
+          );
+        }
+        function rowH(r, d) {
+          const open = S.menu === r.id;
+          return (
+            '<div class="prow' +
+            (r.s === "rec" ? " rec" : "") +
+            '"><button class="pr-main" onclick="A.detail(\'' +
+            r.id +
+            '\')" aria-label="' +
+            r.t +
+            ", " +
+            r.tipo +
+            ", " +
+            (r.o === "manual" ? "manual" : "pelo app") +
+            ", " +
+            lab(r.s) +
+            '"><b class="t">' +
+            r.t +
+            '</b><span class="pr-t"><span>' +
+            r.tipo +
+            "</span><small>" +
+            rowSmall(r) +
+            "</small></span>" +
+            pill(r.s) +
+            "</button>" +
+            '<button class="ib gh sm" onclick="A.rowMenu(\'' +
+            r.id +
+            '\')" aria-label="Mais opções da batida das ' +
+            r.t +
+            '" aria-expanded="' +
+            open +
+            '">' +
+            ic("more", 18) +
+            "</button>" +
+            (open
+              ? '<div class="pop" role="menu"><button role="menuitem" onclick="A.detail(\'' +
+                r.id +
+                "')\">" +
+                ic("eye", 16) +
+                " Ver detalhes</button>" +
+                (!d.locked && r.s !== "rec"
+                  ? '<button role="menuitem" onclick="A.openEdit(\'' +
+                    r.id +
+                    "')\">" +
+                    ic("edit", 16) +
+                    " Solicitar correção</button>"
+                  : "<p>" +
+                    ic("lock", 14) +
+                    " " +
+                    (d.locked ? "Período fechado" : "Inclusão recusada") +
+                    "</p>") +
+                "</div>"
+              : "") +
+            "</div>"
+          );
+        }
+
+        function dx(d) {
+          if (d.id !== "19") {
+            const x = DAYX[d.id];
+            return {
+              tot: d.total,
+              prev: x.prev,
+              saldo: x.saldo,
+              sc: x.saldo[0] === "+" ? "pos" : x.saldo[0] === "−" ? "neg" : "",
+              int: x.int,
+              occ: x.occ,
+            };
+          }
+          const run = running();
+          return {
+            tot: fmtHM(S.sec),
+            prev: "8h 00",
+            saldo: run ? "em curso" : "+0h 01",
+            sc: run ? "" : "pos",
+            int: "59 min",
+            occ: run
+              ? ["Jornada em andamento", "1 batida aguardando envio"]
+              : ["Saída registrada às " + lastT(), "1 batida aguardando envio"],
+          };
+        }
+        SCR["resumo-do-dia"] = () => {
+          const d = dayOf(S.rday) || dayOf("17"),
+            x = dx(d);
+          return (
+            hdr("Resumo do dia") +
+            '<div class="pad pt0"><p class="sub">' +
+            WDL[d.id] +
+            "</p>" +
+            '<div class="card stats">' +
+            [
+              ["Trabalhadas", x.tot],
+              ["Previsto", x.prev],
+              ["Saldo", x.saldo, x.sc],
+              ["Intervalo", x.int],
+            ]
+              .map(
+                (a) =>
+                  "<div><small>" +
+                  a[0] +
+                  '</small><b class="' +
+                  (a[2] || "") +
+                  '">' +
+                  a[1] +
+                  "</b></div>"
+              )
+              .join("") +
+            "</div>" +
+            (d.locked
+              ? '<div class="banner n">' +
+                ic("lock", 16) +
+                "<span>Período fechado · somente consulta</span></div>"
+              : "") +
+            secH("Batidas") +
+            '<div class="card tl">' +
+            d.rows
+              .map(
+                (r) =>
+                  '<button class="tl-i' +
+                  (r.s === "rec" ? " rec" : "") +
+                  '" onclick="A.detail(\'' +
+                  r.id +
+                  '\')"><i class="tl-d ' +
+                  TONE[r.s] +
+                  '"></i><b class="t">' +
+                  r.t +
+                  '</b><span class="pr-t"><span>' +
+                  r.tipo +
+                  "</span><small>" +
+                  rowSmall(r) +
+                  "</small></span>" +
+                  pill(r.s) +
+                  "</button>"
+              )
+              .join("") +
+            "</div>" +
+            secH("Ocorrências") +
+            '<div class="card">' +
+            (x.occ.length
+              ? x.occ
+                  .map(
+                    (o) =>
+                      '<div class="li"><span class="ico y">' +
+                      ic("alert", 16) +
+                      '</span><span class="li-t"><b>' +
+                      o +
+                      "</b></span></div>"
+                  )
+                  .join("")
+              : '<p class="none">Nenhuma ocorrência.</p>') +
+            "</div>" +
+            (d.locked
+              ? ""
+              : '<div class="acts"><button class="btn out" onclick="A.openInsert(\'' +
+                d.id +
+                "')\">" +
+                ic("plus", 16) +
+                ' Incluir</button><button class="btn out" onclick="A.newAt(\'' +
+                d.id +
+                "')\">" +
+                ic("steth", 16) +
+                ' Atestado</button><button class="btn out" onclick="A.openAbono(\'' +
+                d.id +
+                "')\">" +
+                ic("file", 16) +
+                " Abono</button></div>") +
+            "</div>"
+          );
+        };
+
+        SCR.batida = () => {
+          const f = findRow(S.sel) || findRow("17a"),
+            d = f.d,
+            r = f.r;
+          return (
+            hdr("Batida") +
+            '<div class="pad pt0"><p class="sub">' +
+            WDL[d.id] +
+            '</p><div class="card bd"><div class="bd-t"><b>' +
+            r.t +
+            '</b><div><span class="bd-tp">' +
+            r.tipo +
+            '</span><span class="chip">' +
+            (r.o === "manual"
+              ? ic("edit", 13) + " Manual"
+              : ic("phone", 13) + " Pelo app") +
+            "</span></div>" +
+            pill(r.s) +
+            "</div>" +
+            mapSvg() +
+            '<div class="kv">' +
+            (r.before
+              ? kv("Horário original", "<s>" + r.before + "</s>")
+              : "") +
+            kv("Local", LOC) +
+            kv("Precisão", "±8 m") +
+            kv("NSR", r.nsr) +
+            "</div></div>" +
+            (d.locked
+              ? '<div class="banner n">' +
+                ic("lock", 16) +
+                "<span>Período fechado · correção indisponível</span></div>"
+              : r.s === "rec"
+              ? '<div class="banner r">' +
+                ic("alert", 16) +
+                "<span>Inclusão recusada pelo gestor</span></div>"
+              : '<button class="btn out blk mt" onclick="A.openEdit(\'' +
+                r.id +
+                "')\">" +
+                ic("edit", 18) +
+                " Corrigir batida</button>") +
+            "</div>"
+          );
+        };
+
+        const akey = (p) => {
+          const d = p.split(" a ")[0].split("/");
+          return +d[1] * 100 + +d[0];
+        };
+        SCR.atestados = () => {
+          const L = S.ats,
+            nAna = L.filter((a) => a.s === "ana").length,
+            ab = L.filter((a) => a.s === "apr").reduce((t, a) => t + a.dias, 0),
+            nRec = L.filter((a) => a.s === "rec").length;
+          const g = [];
+          L.slice()
+            .sort((x, y) => akey(y.per) - akey(x.per))
+            .forEach((a) => {
+              const m = +a.per.split("/")[1].slice(0, 2);
+              let G = g.find((z) => z.m === m);
+              if (!G) {
+                G = { m, items: [] };
+                g.push(G);
+              }
+              G.items.push(a);
+            });
+          return (
+            hdr("Atestados médicos") +
+            '<div class="pad pt0"><div class="card stats s3"><div><small>Em análise</small><b>' +
+            nAna +
+            "</b></div><div><small>Abonados</small><b>" +
+            dl(ab) +
+            "</b></div><div><small>Recusados</small><b>" +
+            nRec +
+            "</b></div></div>" +
+            '<button class="btn pri blk mt" onclick="A.newAt()">' +
+            ic("plus", 18) +
+            " Enviar atestado</button>" +
+            g
+              .map(
+                (G) =>
+                  secH(MONL[G.m - 1] + " 2026") +
+                  '<div class="card">' +
+                  G.items.map(atRow).join("") +
+                  "</div>"
+              )
+              .join("") +
+            "</div>"
+          );
+        };
+        function atRow(a) {
+          const open = S.menu === "a" + a.id;
+          const cap =
+            (a.s === "apr"
+              ? dl(a.dias) +
+                (a.dias === 1 ? " abonado" : " abonados") +
+                " no ponto"
+              : a.s === "ana"
+              ? dl(a.dias) + " · RH responde até " + a.prazo
+              : a.curto) +
+            (a.files.length > 1 ? " · " + a.files.length + " anexos" : "");
+          return (
+            '<div class="arow"><button class="ar-main" onclick="A.openAt(\'' +
+            a.id +
+            "')\">" +
+            db(a.per.split(" a ")[0]) +
+            '<span class="li-t"><b>' +
+            a.per +
+            '</b><small class="' +
+            (a.s === "rec" ? "neg" : "") +
+            '">' +
+            cap +
+            "</small></span>" +
+            pill(a.s, 1) +
+            "</button>" +
+            '<button class="ib gh sm" onclick="A.atMenu(\'' +
+            a.id +
+            '\')" aria-label="Opções do atestado de ' +
+            a.per +
+            '" aria-expanded="' +
+            open +
+            '">' +
+            ic("more", 18) +
+            "</button>" +
+            (open
+              ? '<div class="pop" role="menu"><button role="menuitem" onclick="A.openAt(\'' +
+                a.id +
+                "')\">" +
+                ic("eye", 16) +
+                " Ver detalhes</button>" +
+                (a.s === "ana"
+                  ? '<button role="menuitem" onclick="A.editAt(\'' +
+                    a.id +
+                    "')\">" +
+                    ic("edit", 16) +
+                    " Editar atestado</button>"
+                  : a.s === "rec"
+                  ? '<button role="menuitem" onclick="A.newAt()">' +
+                    ic("camera", 16) +
+                    " Enviar novo atestado</button>"
+                  : "") +
+                "</div>"
+              : "") +
+            "</div>"
+          );
+        }
+        SCR["enviar-atestado"] = () => {
+          const a = S.at,
+            n = a.files.length;
+          return (
+            hdr(a.edit ? "Editar atestado" : "Enviar atestado") +
+            '<div class="pad pt0 form"><p class="sub">O RH analisa e abona o período no seu ponto em até 2 dias úteis.</p>' +
+            '<div class="fl"><span class="lb">Período</span><div class="seg">' +
+            segB("1 dia", !a.multi, "A.atSet('multi',false)") +
+            segB("Vários dias", a.multi, "A.atSet('multi',true)") +
+            "</div></div>" +
+            (a.multi
+              ? '<div class="two">' +
+                field(
+                  "at-ini",
+                  "Primeiro dia",
+                  a.ini,
+                  "A.inp('at','ini',this.value)"
+                ) +
+                field(
+                  "at-fim",
+                  "Último dia",
+                  a.fim,
+                  "A.inp('at','fim',this.value)"
+                ) +
+                "</div>"
+              : field(
+                  "at-ini",
+                  "Data do atestado",
+                  a.ini,
+                  "A.inp('at','ini',this.value)"
+                )) +
+            '<div class="fl"><span class="lb">Anexos <em>(' +
+            n +
+            " de " +
+            MAXF +
+            ")</em></span>" +
+            (n
+              ? '<div class="card att">' +
+                a.files
+                  .map((f, i) =>
+                    attRow(f, "A.dlForm(" + i + ")", "A.atRm(" + i + ")")
+                  )
+                  .join("") +
+                "</div>"
+              : "") +
+            (n < MAXF
+              ? '<button class="drop' +
+                (n ? " sm" : "") +
+                (a.err && !n ? " bad" : "") +
+                '" onclick="document.getElementById(\'at-file\').click()">' +
+                ic(n ? "plus" : "camera", n ? 20 : 26) +
+                "<b>" +
+                (n
+                  ? "Adicionar outro anexo"
+                  : "Tirar foto ou escolher arquivos") +
+                "</b><small>Atestado, declaração ou exames · JPG, PNG ou PDF até 10 MB cada</small></button>" +
+                '<input id="at-file" type="file" multiple accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" hidden onchange="A.atFiles(this.files);this.value=\'\'">'
+              : "") +
+            "</div>" +
+            (a.err
+              ? '<p class="err" role="alert">' +
+                ic("alert", 16) +
+                a.err +
+                "</p>"
+              : "") +
+            '<label class="fl" for="at-obs"><span class="lb">Observação <em>(opcional)</em></span><textarea id="at-obs" rows="3" maxlength="200" placeholder="Ex.: consulta e repouso" oninput="A.inp(\'at\',\'obs\',this.value)">' +
+            esc(a.obs) +
+            "</textarea></label></div>"
+          );
+        };
+        SCR["atestado-enviado"] = () => {
+          const a = S.atLast || { per: "03/11", dias: 1, n: 2 };
+          return (
+            '<div class="okp"><div class="okc">' +
+            ic("check", 36, 2.4) +
+            "</div><h1>" +
+            (S.atWasEdit ? "Atestado atualizado" : "Atestado enviado") +
+            "</h1><p>O RH vai analisar em até 2 dias úteis. Você recebe uma notificação com a resposta.</p>" +
+            '<div class="card kv">' +
+            kv("Período", a.per) +
+            kv("Dias", dl(a.dias)) +
+            kv("Anexos", nArq(a.n)) +
+            kv("Status", pill("ana", 1)) +
+            "</div>" +
+            '<div class="card pad-c">' +
+            steps([
+              ["Enviado", "Agora", "done"],
+              ["Em análise pelo RH", "Até 2 dias úteis", "cur"],
+              ["Dias abonados no ponto", "Após a aprovação", ""],
+            ]) +
+            "</div></div>"
+          );
+        };
+        SCR.atestado = () => {
+          const a = curAt();
+          const st =
+            a.s === "ana"
+              ? [
+                  ["Enviado", a.sent, "done"],
+                  ["Em análise pelo RH", "Responde até " + a.prazo, "cur"],
+                  ["Decisão", "Você será avisado", ""],
+                ]
+              : a.s === "apr"
+              ? [
+                  ["Enviado", "", "done"],
+                  ["Recebido pelo RH", "", "done"],
+                  [
+                    "Aprovado",
+                    dl(a.dias) +
+                      " abonado" +
+                      (a.dias > 1 ? "s" : "") +
+                      " no ponto",
+                    "ok",
+                  ],
+                ]
+              : [
+                  ["Enviado", "", "done"],
+                  ["Recebido pelo RH", "", "done"],
+                  ["Recusado", "Veja o motivo acima", "bad"],
+                ];
+          return (
+            hdr("Atestado") +
+            '<div class="pad pt0"><div class="card hd">' +
+            db(a.per.split(" a ")[0]) +
+            '<span class="li-t"><b>' +
+            a.per +
+            "</b><small>" +
+            dl(a.dias) +
+            "</small></span>" +
+            pill(a.s, 1) +
+            "</div>" +
+            (a.s === "rec"
+              ? '<div class="banner r col"><b>Motivo da recusa</b><span>' +
+                a.motivo +
+                "</span></div>"
+              : "") +
+            secH(
+              "Anexos",
+              '<span class="mut">' + nArq(a.files.length) + "</span>"
+            ) +
+            '<div class="card att">' +
+            a.files
+              .map((f, i) => attRow(f, "A.dl('" + a.id + "'," + i + ")"))
+              .join("") +
+            "</div>" +
+            '<div class="card kv mt">' +
+            kv("Envio", a.sent) +
+            (a.obs ? kv("Observação", esc(a.obs)) : "") +
+            "</div>" +
+            secH("Andamento") +
+            '<div class="card pad-c">' +
+            steps(st) +
+            "</div></div>"
+          );
+        };
+
+        const byIni = (a, b) => toD(a.ini) - toD(b.ini);
+        const ferNext = () =>
+          S.fers.filter((f) => f.s === "apr" || f.s === "ana").sort(byIni)[0];
+        SCR.ferias = () => {
+          const sd = saldo(),
+            used = 30 - sd,
+            nx = ferNext(),
+            oth = S.fers.filter((f) => f !== nx);
+          return (
+            hdr("Férias") +
+            '<div class="pad pt0"><div class="card sal"><div class="sal-t"><div><small>Disponível</small><b>' +
+            dl(sd) +
+            '</b></div><div class="r2"><small>Tirar até</small><b class="m">10/2027</b></div></div>' +
+            '<div class="bar2" role="img" aria-label="' +
+            used +
+            ' de 30 dias agendados ou em análise"><i style="width:' +
+            ((used / 30) * 100).toFixed(1) +
+            '%"></i></div><span class="mut">' +
+            used +
+            " de 30 dias agendados ou em análise · período aquisitivo 2025/2026</span></div>" +
+            '<button class="btn pri blk mt" onclick="A.newFer()">' +
+            ic("plus", 18) +
+            " Solicitar férias</button>" +
+            (nx ? secH("Próximas férias") + ferCard(nx) : "") +
+            (oth.length
+              ? secH("Outros períodos") +
+                '<div class="card">' +
+                oth.map(ferRow).join("") +
+                "</div>"
+              : "") +
+            "</div>"
+          );
+        };
+        function ferCard(f) {
+          const fal = Math.round((toD(f.ini) - TODAY) / 864e5);
+          return (
+            '<button class="card fcard" onclick="A.openFer(\'' +
+            f.id +
+            '\')"><div class="fc-h">' +
+            db(f.ini) +
+            '<span class="li-t"><b>' +
+            f.ini.slice(0, 5) +
+            " a " +
+            f.fim.slice(0, 5) +
+            "</b><small>" +
+            dl(f.dias) +
+            "</small></span>" +
+            pill(f.s) +
+            "</div>" +
+            '<span class="shift ' +
+            (f.s === "ana" ? "y" : "g") +
+            '"><b>' +
+            (fal === 1 ? "Começa amanhã" : "Começa em " + fal + " dias") +
+            "</b><span>Retorno ao trabalho em " +
+            nextWork(addDays(f.fim, 1)) +
+            "</span></span>" +
+            '<span class="mini">' +
+            ["Enviada", "Gestor", "RH"]
+              .map(
+                (l, i) =>
+                  '<span class="' +
+                  (f.s === "apr" || i === 0 ? "d" : i === 1 ? "c" : "") +
+                  '"><i></i>' +
+                  l +
+                  "</span>"
+              )
+              .join("") +
+            "</span></button>"
+          );
+        }
+        function ferRow(f) {
+          const c =
+            f.s === "rec"
+              ? "fechamento semestral"
+              : f.s === "done"
+              ? "concluídas"
+              : f.s === "apr"
+              ? "aviso e recibo disponíveis"
+              : "aguardando o gestor";
+          return (
+            '<button class="li" onclick="A.openFer(\'' +
+            f.id +
+            "')\">" +
+            db(f.ini) +
+            '<span class="li-t"><b>' +
+            f.ini.slice(0, 5) +
+            " a " +
+            f.fim.slice(0, 5) +
+            '</b><small class="' +
+            (f.s === "rec" ? "neg" : "") +
+            '">' +
+            dl(f.dias) +
+            " · " +
+            c +
+            "</small></span>" +
+            pill(f.s) +
+            "</button>"
+          );
+        }
+        const ferSumH = (f) => {
+          const fim = toD(f.ini) ? addDays(f.ini, f.dias - 1) : "";
+          return fim
+            ? "<b>" +
+                f.ini.slice(0, 5) +
+                " a " +
+                fim.slice(0, 5) +
+                "</b><span>Retorno ao trabalho em " +
+                nextWork(addDays(fim, 1)) +
+                "</span>"
+            : "<b>Data inválida</b><span>Use o formato dd/mm/aaaa</span>";
+        };
+        SCR["solicitar-ferias"] = () => {
+          const f = S.fer;
+          return (
+            hdr("Solicitar férias") +
+            '<div class="pad pt0 form"><div class="banner l">' +
+            ic("sun", 18) +
+            "<span>Você tem <b>" +
+            dl(saldo()) +
+            "</b> disponíveis</span></div>" +
+            field(
+              "fer-ini",
+              "Primeiro dia",
+              f.ini,
+              "A.inp('fer','ini',this.value);A.ferSum()"
+            ) +
+            '<div class="fl"><span class="lb">Quantos dias?</span><div class="chips">' +
+            [5, 10, 15, 20, 30]
+              .map((n) =>
+                chB(n + " dias", f.dias === n, "A.ferSet('dias'," + n + ")")
+              )
+              .join("") +
+            "</div></div>" +
+            '<div class="shift g mt" id="fer-sum" aria-live="polite">' +
+            ferSumH(f) +
+            "</div>" +
+            '<div class="fl"><span class="lb">Vender 10 dias (abono pecuniário)?</span><div class="seg">' +
+            segB("Não", !f.vender, "A.ferSet('vender',false)") +
+            segB("Sim", f.vender, "A.ferSet('vender',true)") +
+            "</div></div>" +
+            '<div class="fl"><span class="lb">Adiantar a 1ª parcela do 13º?</span><div class="seg">' +
+            segB("Não", !f.adiant, "A.ferSet('adiant',false)") +
+            segB("Sim", f.adiant, "A.ferSet('adiant',true)") +
+            "</div></div>" +
+            (f.err
+              ? '<p class="err" role="alert">' +
+                ic("alert", 16) +
+                f.err +
+                "</p>"
+              : "") +
+            '<details class="card rules" open><summary>Regras para dividir as férias</summary><ul><li>Até 3 períodos por ano.</li><li>Um período com pelo menos 14 dias; os outros com no mínimo 5.</li><li>Não podem começar nos 2 dias antes de feriado ou do descanso semanal.</li><li>O aviso de férias chega com 30 dias de antecedência.</li></ul></details></div>'
+          );
+        };
+        SCR["ferias-enviada"] = () => {
+          const f = S.ferLast || {
+            ini: "04/01/2027",
+            fim: "13/01/2027",
+            dias: 10,
+          };
+          return (
+            '<div class="okp"><div class="okc">' +
+            ic("check", 36, 2.4) +
+            "</div><h1>Solicitação de férias enviada</h1><p>Seu gestor vai avaliar o período. Os dias ficam reservados enquanto a solicitação estiver em análise.</p>" +
+            '<div class="card kv">' +
+            kv("Período", f.ini.slice(0, 5) + " a " + f.fim.slice(0, 5)) +
+            kv("Dias", dl(f.dias)) +
+            kv("Retorno", nextWork(addDays(f.fim, 1))) +
+            kv("Status", pill("ana")) +
+            "</div>" +
+            '<div class="card pad-c">' +
+            steps([
+              ["Enviada", "Agora", "done"],
+              ["Aprovação do gestor", "Em análise", "cur"],
+              ["Confirmação do RH", "Aviso e recibo de férias", ""],
+            ]) +
+            "</div></div>"
+          );
+        };
+        SCR["ferias-detalhe"] = () => {
+          const f = curFer();
+          const st =
+            f.s === "ana"
+              ? [
+                  ["Enviada", f.sent, "done"],
+                  ["Aprovação do gestor", "Em análise", "cur"],
+                  ["Confirmação do RH", "Aviso e recibo", ""],
+                ]
+              : f.s === "apr"
+              ? [
+                  ["Enviada", "", "done"],
+                  ["Aprovada pelo gestor", "", "done"],
+                  ["Confirmada pelo RH", "Aviso e recibo disponíveis", "ok"],
+                ]
+              : f.s === "rec"
+              ? [
+                  ["Enviada", "", "done"],
+                  ["Recusada pelo gestor", "Veja o motivo acima", "bad"],
+                ]
+              : [["Férias concluídas", "Período aquisitivo 2024/2025", "ok"]];
+          return (
+            hdr("Férias") +
+            '<div class="pad pt0"><div class="card hd">' +
+            db(f.ini) +
+            '<span class="li-t"><b>' +
+            f.ini.slice(0, 5) +
+            " a " +
+            f.fim.slice(0, 5) +
+            "</b><small>" +
+            dl(f.dias) +
+            " · " +
+            f.ini.slice(6) +
+            "</small></span>" +
+            pill(f.s) +
+            "</div>" +
+            (f.s === "rec"
+              ? '<div class="banner r col"><b>Motivo da recusa</b><span>' +
+                f.motivo +
+                "</span></div>"
+              : "") +
+            '<div class="card kv mt">' +
+            kv("Primeiro dia", f.ini) +
+            kv("Último dia", f.fim) +
+            kv("Retorno", nextWork(addDays(f.fim, 1))) +
+            kv("Abono pecuniário", f.vender ? "Sim, 10 dias" : "Não") +
+            kv("Adiantamento do 13º", f.adiant ? "Sim" : "Não") +
+            "</div>" +
+            secH("Andamento") +
+            '<div class="card pad-c">' +
+            steps(st) +
+            "</div></div>"
+          );
+        };
+
+        const tgl = (k, i, t, s) =>
+          '<label class="li tg"><span class="ico l">' +
+          ic(i, 18) +
+          '</span><span class="li-t"><b>' +
+          t +
+          "</b>" +
+          (s ? "<small>" + s + "</small>" : "") +
+          '</span><input type="checkbox" role="switch" ' +
+          (S.prefs[k] ? "checked" : "") +
+          " onchange=\"A.pref('" +
+          k +
+          '\',this.checked)"><i class="sw"></i></label>';
+        SCR.perfil = () =>
+          '<header class="top main"><h1>Perfil</h1></header><div class="pad pt0"><div class="card prof"><span class="av lg">AC</span><span class="li-t"><b>Ana Costa</b><small>Analista administrativa</small></span></div>' +
+          '<div class="card kv mt">' +
+          kv("Matrícula", "01408") +
+          kv("Unidade", "Araçatuba") +
+          kv("Jornada", "44h semanais · 08:00 – 17:00") +
+          "</div>" +
+          secH("Preferências") +
+          '<div class="card">' +
+          tgl("bio", "fp", "Pedir biometria ao abrir o app") +
+          tgl(
+            "lemb",
+            "bell",
+            "Lembretes de registro",
+            "Aviso 5 min antes de cada horário"
+          ) +
+          tgl("mapa", "map", "Mapa offline", "Araçatuba · baixado") +
+          "</div>" +
+          secH("Conta") +
+          '<div class="card">' +
+          liB(
+            "lock",
+            "n",
+            "Alterar senha",
+            "",
+            "A.toast('Enviamos um link para alterar a senha no seu e-mail.')"
+          ) +
+          liB(
+            "help",
+            "n",
+            "Ajuda e suporte",
+            "Perguntas frequentes e contato com o RH",
+            "A.toast('A central de ajuda abre aqui.')"
+          ) +
+          '<button class="li danger" onclick="A.logout()"><span class="ico r">' +
+          ic("logout", 18) +
+          '</span><span class="li-t"><b>Sair da conta</b></span></button></div><p class="ver">Single · versão 2.0</p></div>';
+
+        const PARENT = {
+          "resumo-do-dia": "ponto",
+          batida: "ponto",
+          "enviar-atestado": "atestados",
+          atestado: "atestados",
+          "atestado-enviado": "atestados",
+          "solicitar-ferias": "ferias",
+          "ferias-enviada": "ferias",
+          "ferias-detalhe": "ferias",
+        };
+        const TABS = new Set([
+          "inicio",
+          "notificacoes",
+          "ponto",
+          "resumo-do-dia",
+          "batida",
+          "atestados",
+          "ferias",
+          "perfil",
+        ]);
+        const curTab = () =>
+          ({
+            inicio: "inicio",
+            notificacoes: "inicio",
+            ponto: "ponto",
+            "resumo-do-dia": "ponto",
+            batida: "ponto",
+            perfil: "perfil",
+            atestados: "menu",
+            ferias: "menu",
+          }[S.scr] || "");
+        const FOOT = {
+          "enviar-atestado": () =>
+            '<button class="btn pri blk" onclick="A.atSubmit()">' +
+            (S.at && S.at.edit ? "Salvar alterações" : "Enviar atestado") +
+            "</button>",
+          "solicitar-ferias": () =>
+            '<button class="btn pri blk" onclick="A.ferSubmit()">Enviar solicitação</button>',
+          "atestado-enviado": () =>
+            '<button class="btn pri blk" onclick="A.rep(\'atestados\')">Ver meus atestados</button><button class="btn gh blk" onclick="A.tab(\'inicio\')">Voltar ao início</button>',
+          "ferias-enviada": () =>
+            '<button class="btn pri blk" onclick="A.rep(\'ferias\')">Ver minhas férias</button><button class="btn gh blk" onclick="A.tab(\'inicio\')">Voltar ao início</button>',
+          atestado: () => {
+            const a = curAt();
+            return a.s === "ana"
+              ? '<button class="btn out blk" onclick="A.editAt(\'' +
+                  a.id +
+                  "')\">" +
+                  ic("edit", 18) +
+                  " Editar atestado</button>"
+              : a.s === "rec"
+              ? '<button class="btn pri blk" onclick="A.newAt()">' +
+                ic("camera", 18) +
+                " Enviar novo atestado</button>"
+              : "";
+          },
+          "ferias-detalhe": () => {
+            const f = curFer();
+            return f.s === "apr"
+              ? '<div class="two"><button class="btn out" onclick="A.ferDoc(\'aviso\')">' +
+                  ic("download", 18) +
+                  ' Aviso</button><button class="btn out" onclick="A.ferDoc(\'recibo\')">' +
+                  ic("download", 18) +
+                  " Recibo</button></div>"
+              : f.s === "rec"
+              ? '<button class="btn pri blk" onclick="A.newFer()">Solicitar outro período</button>'
+              : "";
+          },
+        };
+
+        /* ---------- folhas (bottom sheets) ---------- */
+        const sheetW = (t, body, foot, o) => {
+          o = o || {};
+          return (
+            '<div class="scrim" onclick="' +
+            (o.lock ? "" : "A.closeSheet()") +
+            '"></div><section class="sheet" role="dialog" aria-modal="true" aria-label="' +
+            esc(t) +
+            '"><div class="grab"></div><div class="sh-h' +
+            (o.left ? " c" : "") +
+            '">' +
+            (o.left || "") +
+            "<h2>" +
+            t +
+            "</h2>" +
+            (o.lock
+              ? ""
+              : '<button class="ib sm" onclick="A.closeSheet()" aria-label="Fechar">' +
+                ic("x", 16) +
+                "</button>") +
+            '</div><div class="sh-b">' +
+            body +
+            "</div>" +
+            (foot ? '<div class="sh-f">' + foot + "</div>" : "") +
+            "</section>"
+          );
+        };
+        const SHEET = {};
+        SHEET.ponto = () => {
+          const t = S.pTipo,
+            tm = nowT();
+          return sheetW(
+            "Registrar " + t.toLowerCase() + " às " + tm + "?",
+            '<p class="sub">Quinta, 19 de novembro</p>' +
+              mapSvg() +
+              '<div class="kv">' +
+              kv("Local", LOC) +
+              kv(
+                "Tipo",
+                t +
+                  (S.pLoading
+                    ? ""
+                    : '<button class="lnk sm" onclick="A.pSwap()">Alterar</button>')
+              ) +
+              "</div>",
+            S.pLoading
+              ? '<button class="btn pri blk" disabled aria-busy="true"><span class="spin"></span> Registrando…</button><p class="cap">Aguarde a confirmação do servidor</p>'
+              : '<button class="btn pri blk" onclick="A.confirmPonto()">Confirmar registro</button><button class="btn gh blk" onclick="A.closeSheet()">Cancelar</button>',
+            { lock: S.pLoading }
+          );
+        };
+        SHEET.filtros = () => {
+          const n = filtered().reduce((a, d) => a + d.rows.length, 0);
+          return sheetW(
+            "Filtros",
+            '<div class="fl"><span class="lb">Período</span><div class="seg">' +
+              [
+                ["hoje", "Hoje"],
+                ["d7", "7 dias"],
+                ["mes", "Mês"],
+                ["outro", "Outro"],
+              ]
+                .map((x) =>
+                  segB(x[1], S.fPer === x[0], "A.setF('fPer','" + x[0] + "')")
+                )
+                .join("") +
+              "</div></div>" +
+              (S.fPer === "outro"
+                ? '<div class="two">' +
+                  field(
+                    "f-ini",
+                    "Data inicial",
+                    S.fIni,
+                    "A.inp('','fIni',this.value)"
+                  ) +
+                  field(
+                    "f-fim",
+                    "Data final",
+                    S.fFim,
+                    "A.inp('','fFim',this.value)"
+                  ) +
+                  "</div>"
+                : "") +
+              '<div class="fl"><span class="lb">Origem</span><div class="seg">' +
+              [
+                ["all", "Todas"],
+                ["app", "App"],
+                ["manual", "Manual"],
+              ]
+                .map((x) =>
+                  segB(x[1], S.fOrig === x[0], "A.setF('fOrig','" + x[0] + "')")
+                )
+                .join("") +
+              "</div></div>" +
+              '<div class="fl"><span class="lb">Status</span><div class="chips">' +
+              STATS.map((x) =>
+                chB(x[1], S.fStat === x[0], "A.setF('fStat','" + x[0] + "')")
+              ).join("") +
+              "</div></div>",
+            '<button class="btn pri blk" onclick="A.closeSheet()">Ver ' +
+              n +
+              (n === 1 ? " batida" : " batidas") +
+              "</button>",
+            { left: '<button class="lnk" onclick="A.clearF()">Limpar</button>' }
+          );
+        };
+        SHEET.dia_menu = () => {
+          const d = dayOf(S.pk.day),
+            tot = dayTotal(d);
+          return sheetW(
+            d.wd + ", " + d.d,
+            '<p class="sub">' +
+              (tot === "em andamento"
+                ? "Jornada em andamento"
+                : tot + " trabalhadas") +
+              '</p><div class="card">' +
+              liB(
+                "list",
+                "y",
+                "Resumo do dia",
+                "Jornada, intervalos e ocorrências",
+                "A.go('resumo-do-dia',{rday:'" + d.id + "'})"
+              ) +
+              (d.locked
+                ? ""
+                : liB(
+                    "plus",
+                    "l",
+                    "Incluir batida",
+                    "Esqueceu de registrar uma entrada ou saída",
+                    "A.openInsert('" + d.id + "')"
+                  ) +
+                  liB(
+                    "steth",
+                    "g",
+                    "Enviar atestado",
+                    "Ausência por motivo de saúde",
+                    "A.newAt('" + d.id + "')"
+                  ) +
+                  liB(
+                    "file",
+                    "pe",
+                    "Solicitar abono",
+                    "Outras ausências justificadas",
+                    "A.openAbono('" + d.id + "')"
+                  )) +
+              "</div>" +
+              (d.locked
+                ? '<div class="banner n">' +
+                  ic("lock", 16) +
+                  "<span>Período fechado. Este dia está disponível só para consulta.</span></div>"
+                : ""),
+            '<button class="btn gh blk" onclick="A.closeSheet()">Cancelar</button>'
+          );
+        };
+        const col = (k, v, mod) =>
+          '<div class="wcol">' +
+          [-2, -1, 0, 1, 2]
+            .map((o) => {
+              const x = (v + o + mod) % mod;
+              return (
+                '<button class="' +
+                (o === 0 ? "cur" : "o" + Math.abs(o)) +
+                '"' +
+                (o === 0 ? ' aria-current="true"' : "") +
+                " onclick=\"A.edSet('" +
+                k +
+                "'," +
+                x +
+                ')" aria-label="' +
+                (k === "h" ? "Hora " : "Minuto ") +
+                pad(x) +
+                '">' +
+                pad(x) +
+                "</button>"
+              );
+            })
+            .join("") +
+          "</div>";
+        SHEET.edit = () => {
+          const e = S.ed,
+            d = dayOf(e.day),
+            r = e.row ? findRow(e.row).r : null;
+          const title = r
+            ? "Corrigir " + (r.before ? "batida" : r.tipo.toLowerCase())
+            : "Incluir batida";
+          const sub = r
+            ? d.wds +
+              ", " +
+              d.ds +
+              " · registrada às " +
+              (r.before || r.t) +
+              (r.o === "manual" ? " manualmente" : " pelo app")
+            : d.wd + ", " + d.ds;
+          const tipo =
+            '<div class="fl"><span class="lb">Tipo</span><div class="seg">' +
+            segB("Entrada", e.tipo === "Entrada", "A.edSet('tipo','Entrada')") +
+            segB("Saída", e.tipo === "Saída", "A.edSet('tipo','Saída')") +
+            "</div></div>";
+          const wheel =
+            '<div class="fl"><span class="lb">Horário correto</span><div class="wheel" role="group" aria-label="Horário">' +
+            col("h", e.h, 24) +
+            '<b class="colon">:</b>' +
+            col("m", e.m, 60) +
+            "</div></div>";
+          return sheetW(
+            title,
+            '<p class="sub">' +
+              sub +
+              "</p>" +
+              (r ? wheel + tipo : tipo + wheel) +
+              '<div class="fl"><span class="lb">Motivo</span><div class="chips">' +
+              MOTIVOS.map((m) =>
+                chB(m, e.mot === m, "A.edSet('mot','" + m + "')")
+              ).join("") +
+              "</div></div>" +
+              (e.mot === "Outro"
+                ? '<label class="fl" for="ed-t"><span class="lb">Descreva o motivo <em>(obrigatório)</em></span><textarea id="ed-t" rows="3" maxlength="200" oninput="A.inp(\'ed\',\'txt\',this.value);document.getElementById(\'ed-c\').textContent=this.value.length+\'/200\'">' +
+                  esc(e.txt) +
+                  '</textarea><small class="cnt" id="ed-c">' +
+                  e.txt.length +
+                  "/200</small></label>"
+                : "") +
+              (e.err
+                ? '<p class="err" role="alert">' +
+                  ic("alert", 16) +
+                  e.err +
+                  "</p>"
+                : ""),
+            '<button class="btn pri blk" onclick="A.submitEdit()">Enviar para aprovação</button>'
+          );
+        };
+        SHEET.abono = () => {
+          const b = S.ab;
+          return sheetW(
+            "Solicitar abono",
+            '<p class="sub">Justifique uma ausência sem atestado médico.</p>' +
+              field("ab-d", "Data", b.data, "A.inp('ab','data',this.value)") +
+              '<div class="fl"><span class="lb">Período</span><div class="seg">' +
+              segB("Dia inteiro", !b.horas, "A.abSet('horas',false)") +
+              segB("Algumas horas", b.horas, "A.abSet('horas',true)") +
+              "</div></div>" +
+              (b.horas
+                ? '<div class="two">' +
+                  field(
+                    "ab-das",
+                    "Das",
+                    b.das,
+                    "A.inp('ab','das',this.value)",
+                    null,
+                    "clock"
+                  ) +
+                  field(
+                    "ab-as",
+                    "Às",
+                    b.as,
+                    "A.inp('ab','as',this.value)",
+                    null,
+                    "clock"
+                  ) +
+                  "</div>"
+                : "") +
+              '<div class="fl"><span class="lb">Motivo</span><div class="chips">' +
+              ABTIPOS.map((t) =>
+                chB(t, b.tipo === t, "A.abSet('tipo','" + t + "')")
+              ).join("") +
+              "</div></div>" +
+              '<label class="fl" for="ab-j"><span class="lb">Justificativa <em>' +
+              (b.tipo === "Outro" ? "(obrigatória)" : "(opcional)") +
+              '</em></span><textarea id="ab-j" rows="3" maxlength="200" oninput="A.inp(\'ab\',\'just\',this.value)">' +
+              esc(b.just) +
+              "</textarea></label>" +
+              (b.err
+                ? '<p class="err" role="alert">' +
+                  ic("alert", 16) +
+                  b.err +
+                  "</p>"
+                : ""),
+            '<button class="btn pri blk" onclick="A.submitAbono()">Solicitar abono</button>'
+          );
+        };
+        const KI = {
+          Inclusão: ["plus", "l"],
+          Correção: ["edit", "l"],
+          Atestado: ["steth", "g"],
+          Abono: ["file", "pe"],
+          Férias: ["sun", "b"],
+        };
+        SHEET.reqs = () =>
+          sheetW(
+            "Minhas solicitações",
+            '<div class="card">' +
+              S.reqs
+                .map(
+                  (q) =>
+                    '<div class="li"><span class="ico ' +
+                    KI[q.kind][1] +
+                    '">' +
+                    ic(KI[q.kind][0], 16) +
+                    '</span><span class="li-t"><b>' +
+                    q.kind +
+                    "</b><small>" +
+                    q.desc +
+                    " · " +
+                    q.when +
+                    "</small></span>" +
+                    pill(q.s) +
+                    "</div>"
+                )
+                .join("") +
+              "</div>",
+            '<button class="btn pri blk" onclick="A.openChooser()">' +
+              ic("plus", 18) +
+              " Nova solicitação</button>"
+          );
+        SHEET.nova = () =>
+          sheetW(
+            "Nova solicitação",
+            '<div class="card">' +
+              liB(
+                "edit",
+                "l",
+                "Corrigir batida",
+                "Horário ou tipo registrado errado",
+                "A.choose('fix')"
+              ) +
+              liB(
+                "plus",
+                "l",
+                "Incluir batida",
+                "Esqueci de registrar uma entrada ou saída",
+                "A.choose('add')"
+              ) +
+              liB(
+                "steth",
+                "g",
+                "Enviar atestado",
+                "Ausência por motivo de saúde",
+                "A.newAt()"
+              ) +
+              liB(
+                "file",
+                "pe",
+                "Solicitar abono",
+                "Outras ausências justificadas",
+                "A.openAbono()"
+              ) +
+              liB(
+                "sun",
+                "b",
+                "Solicitar férias",
+                "Escolher período de descanso",
+                "A.newFer()"
+              ) +
+              "</div>"
+          );
+        SHEET.dia = () =>
+          sheetW(
+            S.pk.kind === "add" ? "Incluir batida" : "Corrigir batida",
+            '<p class="sub">Escolha o dia</p><div class="card">' +
+              S.days
+                .map((d) =>
+                  d.locked
+                    ? '<div class="li dis"><span class="li-t"><b>' +
+                      d.wd +
+                      ", " +
+                      d.d +
+                      "</b><small>" +
+                      d.total +
+                      '</small></span><span class="chip lk">' +
+                      ic("lock", 13) +
+                      " Fechado</span></div>"
+                    : '<button class="li" onclick="A.pickDay(\'' +
+                      d.id +
+                      '\')"><span class="li-t"><b>' +
+                      d.wd +
+                      ", " +
+                      d.d +
+                      "</b><small>" +
+                      dayTotal(d) +
+                      "</small></span>" +
+                      ic("chevR", 18) +
+                      "</button>"
+                )
+                .join("") +
+              "</div>"
+          );
+        SHEET.batidas = () => {
+          const d = dayOf(S.pk.day);
+          return sheetW(
+            "Qual batida corrigir?",
+            '<p class="sub">' +
+              d.wd +
+              ", " +
+              d.d +
+              '</p><div class="card">' +
+              d.rows
+                .filter(live)
+                .map(
+                  (r) =>
+                    '<button class="li" onclick="A.openEdit(\'' +
+                    r.id +
+                    '\')"><b class="t">' +
+                    r.t +
+                    '</b><span class="li-t"><b>' +
+                    r.tipo +
+                    "</b><small>" +
+                    (r.o === "manual" ? "Manual" : "App") +
+                    "</small></span>" +
+                    pill(r.s) +
+                    "</button>"
+                )
+                .join("") +
+              "</div>",
+            "",
+            {
+              left:
+                '<button class="ib sm" onclick="A.choose(\'fix\')" aria-label="Voltar aos dias">' +
+                ic("chevL", 16) +
+                "</button>",
+            }
+          );
+        };
+
+        function drawer() {
+          const c =
+              {
+                inicio: "inicio",
+                notificacoes: "inicio",
+                ponto: "ponto",
+                "resumo-do-dia": "ponto",
+                batida: "ponto",
+                atestados: "at",
+                atestado: "at",
+                ferias: "fer",
+                "ferias-detalhe": "fer",
+                perfil: "perfil",
+              }[S.scr] || "",
+            nA = S.ats.filter((a) => a.s === "ana").length;
+          const it = (id, i, l, s, f, b) =>
+            '<button class="dr-i' +
+            (c === id ? " on" : "") +
+            '" onclick="' +
+            f +
+            '"' +
+            (c === id ? ' aria-current="page"' : "") +
+            '><span class="dr-ic">' +
+            ic(i, 18) +
+            '</span><span class="li-t"><b>' +
+            l +
+            "</b><small>" +
+            s +
+            "</small></span>" +
+            (b ? '<span class="badge s">' + b + "</span>" : "") +
+            "</button>";
+          return (
+            '<div class="scrim" onclick="A.closeDrawer()"></div><nav class="drawer" aria-label="Menu"><div class="dr-top">' +
+            logo(30) +
+            '<b class="wm">Single</b><span class="sp"></span><button class="ib sm" onclick="A.closeDrawer()" aria-label="Fechar menu">' +
+            ic("x", 16) +
+            "</button></div>" +
+            '<button class="dr-prof" onclick="A.tab(\'perfil\')"><span class="av">AC</span><span class="li-t"><b>Ana Costa</b><small>Analista administrativa</small></span>' +
+            ic("chevR", 18) +
+            '</button><div class="dr-b">' +
+            '<p class="dr-s">Ponto</p>' +
+            it(
+              "inicio",
+              "home",
+              "Início",
+              "Registrar ponto e jornada de hoje",
+              "A.tab('inicio')"
+            ) +
+            it(
+              "ponto",
+              "clip",
+              "Ponto",
+              "Batidas, correções e resumo do dia",
+              "A.tab('ponto')"
+            ) +
+            '<p class="dr-s">Solicitações</p>' +
+            it(
+              "at",
+              "steth",
+              "Atestados médicos",
+              nA ? nA + " em análise" : "Nenhum em análise",
+              "A.go('atestados')",
+              nA
+            ) +
+            it(
+              "fer",
+              "sun",
+              "Férias",
+              dl(saldo()) + " disponíveis",
+              "A.go('ferias')"
+            ) +
+            it(
+              "req",
+              "inbox",
+              "Minhas solicitações",
+              pendN() + " em análise",
+              "A.openReqs()"
+            ) +
+            '<p class="dr-s">Conta</p>' +
+            it(
+              "perfil",
+              "user",
+              "Perfil",
+              "Dados, matrícula e preferências",
+              "A.tab('perfil')"
+            ) +
+            '</div><button class="dr-out" onclick="A.logout()">' +
+            ic("logout", 18) +
+            " Sair da conta</button></nav>"
+          );
+        }
+        function compH() {
+          const c = S.comp;
+          return (
+            '<div class="comp" role="dialog" aria-modal="true" aria-label="Comprovante de registro"><div class="comp-b"><div class="okc">' +
+            ic("check", 36, 2.4) +
+            "</div><h1>" +
+            c.tipo +
+            ' registrada</h1><p class="big">às ' +
+            c.t +
+            "</p><p>" +
+            (c.tipo === "Saída"
+              ? "Bom descanso, Ana. Hoje você trabalhou " +
+                fmtHM(S.sec) +
+                "min."
+              : "Bom trabalho, Ana. Sua entrada foi enviada.") +
+            "</p>" +
+            '<div class="card kv">' +
+            kv("Data", "19/11/2026") +
+            kv("Local", "Araçatuba · ±8 m") +
+            kv("Status", pill("ok")) +
+            kv("NSR", c.nsr) +
+            "</div></div>" +
+            '<div class="foot"><button class="btn pri blk" onclick="A.closeComp()">Concluir</button><button class="btn out blk" onclick="A.toast(\'Comprovante pronto para compartilhar.\')">' +
+            ic("share", 18) +
+            " Compartilhar comprovante</button></div></div>"
+          );
+        }
+
+        /* ---------- desenho ---------- */
+        const app = $("#app");
+        function render() {
+          const sc = $("#scr"),
+            same = lastScr === S.scr,
+            top = sc && same ? sc.scrollTop : 0,
+            wk = $("#week"),
+            wl = wk && same ? wk.scrollLeft : null;
+          const s = SCR[S.scr] ? S.scr : "inicio",
+            ft = FOOT[s] ? FOOT[s]() : "";
+          const tb = TABS.has(s)
+            ? (() => {
+                const c = curTab(),
+                  b = (k, i, l, f) =>
+                    '<button class="' +
+                    (c === k ? "on" : "") +
+                    '" onclick="' +
+                    f +
+                    '"' +
+                    (c === k ? ' aria-current="page"' : "") +
+                    "><i>" +
+                    ic(i, 22) +
+                    "</i>" +
+                    l +
+                    "</button>";
+                return (
+                  '<nav class="tabs" aria-label="Navegação principal">' +
+                  b("inicio", "home", "Início", "A.tab('inicio')") +
+                  b("ponto", "clip", "Ponto", "A.tab('ponto')") +
+                  b("perfil", "user", "Perfil", "A.tab('perfil')") +
+                  b("menu", "menu", "Menu", "A.openDrawer()") +
+                  "</nav>"
+                );
+              })()
+            : "";
+          app.innerHTML =
+            '<div class="sbar" aria-hidden="true"><span>' +
+            nowT() +
+            '</span><span><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#1E2941"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#1E2941"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#1E2941"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#1E2941"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#1E2941" opacity=".45"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1E2941"/><rect x="23.5" y="4" width="2" height="4" rx="1" fill="#1E2941" opacity=".45"/></svg></span></div>' +
+            '<div class="scroll" id="scr">' +
+            SCR[s]() +
+            "</div>" +
+            (ft ? '<div class="foot">' + ft + "</div>" : "") +
+            tb +
+            (S.menu
+              ? '<div class="scrim0" onclick="A.closeMenu()"></div>'
+              : "") +
+            (S.drawer ? drawer() : "") +
+            (S.sheet && SHEET[S.sheet] ? SHEET[S.sheet]() : "") +
+            (S.comp ? compH() : "") +
+            (S.toast
+              ? '<div class="toast" role="status">' +
+                ic(S.toast.indexOf("fechado") >= 0 ? "lock" : "check", 18) +
+                "<span>" +
+                esc(S.toast) +
+                '</span><button onclick="A.closeToast()">OK</button></div>'
+              : "");
+          const n = $("#scr");
+          if (n) n.scrollTop = top;
+          const w = $("#week");
+          if (w) {
+            if (wl !== null) w.scrollLeft = wl;
+            else {
+              const t = w.querySelector(".today");
+              if (t)
+                w.scrollLeft = Math.max(0, t.offsetLeft - w.offsetLeft - 44);
+            }
+          }
+          lastScr = S.scr;
+          syncIdx();
+        }
+        const setHash = () => {
+          try {
+            if (location.hash.slice(1) !== S.scr) location.hash = S.scr;
+          } catch (e) {}
+        };
+        const lockedMsg = () => {
+          S.sheet = null;
+          S.menu = null;
+          A.toast(
+            "Este dia está num período fechado. Não é possível corrigir ou incluir batidas."
+          );
+        };
+        const clean = () => {
+          S.sheet = null;
+          S.drawer = false;
+          S.menu = null;
+        };
+
+        const A = (window.A = {
+          render,
+          go(scr, patch) {
+            if (patch) Object.assign(S, patch);
+            if (scr !== S.scr) {
+              S.hist.push(S.scr);
+              if (S.hist.length > 30) S.hist.shift();
+            }
+            S.scr = scr;
+            clean();
+            setHash();
+            render();
+          },
+          rep(scr) {
+            S.hist = ["inicio"];
+            S.scr = scr;
+            clean();
+            setHash();
+            render();
+          },
+          back() {
+            S.scr = S.hist.pop() || PARENT[S.scr] || "inicio";
+            clean();
+            setHash();
+            render();
+          },
+          tab(t) {
+            S.hist = [];
+            S.scr = t;
+            clean();
+            setHash();
+            render();
+          },
+          openDrawer() {
+            S.drawer = true;
+            S.menu = null;
+            render();
+          },
+          closeDrawer() {
+            S.drawer = false;
+            render();
+          },
+          closeSheet() {
+            if (S.pLoading) return;
+            S.sheet = null;
+            render();
+          },
+          toast(m) {
+            S.toast = m;
+            S.drawer = false;
+            render();
+            clearTimeout(tt);
+            tt = setTimeout(() => {
+              S.toast = null;
+              render();
+            }, 3400);
+          },
+          closeToast() {
+            S.toast = null;
+            render();
+          },
+          inp(o, k, v) {
+            if (o) S[o][k] = v;
+            else S[k] = v;
+          },
+          login() {
+            A.tab("inicio");
+          },
+          logout() {
+            S.hist = [];
+            S.scr = "entrar";
+            clean();
+            setHash();
+            render();
+          },
+          openPonto() {
+            S.pTipo = running() ? "Saída" : "Entrada";
+            S.sheet = "ponto";
+            S.drawer = false;
+            S.menu = null;
+            render();
+          },
+          pSwap() {
+            S.pTipo = S.pTipo === "Saída" ? "Entrada" : "Saída";
+            render();
+          },
+          confirmPonto() {
+            if (S.pLoading) return;
+            S.pLoading = true;
+            render();
+            setTimeout(() => {
+              const t = nowT();
+              S.punches++;
+              const nsr = String(184 + S.punches).padStart(6, "0");
+              today().rows.push({
+                id: "19p" + S.punches,
+                t,
+                tipo: S.pTipo,
+                o: "app",
+                s: "ok",
+                nsr,
+              });
+              S.pLoading = false;
+              S.sheet = null;
+              S.comp = { tipo: S.pTipo, t, nsr };
+              S.nread.n2 = true;
+              render();
+            }, 1600);
+          },
+          closeComp() {
+            S.comp = null;
+            render();
+          },
+          readAll() {
+            NOTS.forEach((n) => {
+              S.nread[n.id] = true;
+            });
+            render();
+          },
+          openNotif(id) {
+            S.nread[id] = true;
+            ({
+              n2: () => A.openPonto(),
+              n1: () => A.openAt("a1"),
+              n3: () => A.tab("ponto"),
+              n4: () => A.openFer("f1"),
+              n5: () => A.openAt("a2"),
+            })[id]();
+          },
+          openFilter() {
+            S.sheet = "filtros";
+            S.menu = null;
+            render();
+          },
+          setF(k, v) {
+            S[k] = v;
+            render();
+          },
+          clearF() {
+            S.fPer = "mes";
+            S.fOrig = "all";
+            S.fStat = "all";
+            render();
+          },
+          dayMenu(id) {
+            S.pk = { day: id };
+            S.sheet = "dia_menu";
+            S.menu = null;
+            render();
+          },
+          rowMenu(id) {
+            S.menu = S.menu === id ? null : id;
+            render();
+          },
+          atMenu(id) {
+            S.menu = S.menu === "a" + id ? null : "a" + id;
+            render();
+          },
+          closeMenu() {
+            S.menu = null;
+            render();
+          },
+          detail(id) {
+            A.go("batida", { sel: id });
+          },
+          openEdit(id) {
+            const f = findRow(id);
+            if (!f) return;
+            if (f.d.locked) return lockedMsg();
+            const p = f.r.t.split(":").map(Number);
+            S.ed = {
+              row: id,
+              day: f.d.id,
+              h: p[0],
+              m: p[1],
+              tipo: f.r.tipo,
+              mot: null,
+              txt: "",
+              err: "",
+            };
+            S.sheet = "edit";
+            S.menu = null;
+            S.drawer = false;
+            render();
+          },
+          openInsert(dayId) {
+            const d = dayOf(dayId);
+            if (d.locked) return lockedMsg();
+            const rows = d.rows.filter(live),
+              last = rows[rows.length - 1],
+              tipo = last && last.tipo === "Entrada" ? "Saída" : "Entrada";
+            S.ed = {
+              row: null,
+              day: dayId,
+              h: tipo === "Saída" ? 17 : 8,
+              m: 0,
+              tipo,
+              mot: null,
+              txt: "",
+              err: "",
+            };
+            S.sheet = "edit";
+            S.menu = null;
+            render();
+          },
+          edSet(k, v) {
+            S.ed[k] = v;
+            S.ed.err = "";
+            render();
+          },
+          submitEdit() {
+            const e = S.ed;
+            if (!e.mot) {
+              e.err = "Escolha um motivo para enviar.";
+              return render();
+            }
+            if (e.mot === "Outro" && !e.txt.trim()) {
+              e.err = "Descreva o motivo para enviar.";
+              return render();
+            }
+            const d = dayOf(e.day),
+              t = pad(e.h) + ":" + pad(e.m);
+            if (e.row) {
+              const r = d.rows.find((x) => x.id === e.row);
+              if (!r.before) r.before = r.t;
+              Object.assign(r, {
+                t,
+                tipo: e.tipo,
+                o: "manual",
+                s: "ana",
+                nsr: "—",
+              });
+            } else
+              d.rows.push({
+                id: d.id + "n" + Date.now(),
+                t,
+                tipo: e.tipo,
+                o: "manual",
+                s: "ana",
+                nsr: "—",
+              });
+            d.rows.sort((a, b) => a.t.localeCompare(b.t));
+            pushReq(
+              e.row ? "Correção" : "Inclusão",
+              e.tipo + " · " + d.ds + " às " + t
+            );
+            S.sheet = null;
+            A.toast("Solicitação enviada para aprovação.");
+          },
+          openAbono(dayId) {
+            const d = dayId ? dayOf(dayId) : null;
+            if (d && d.locked) return lockedMsg();
+            S.ab = {
+              data: (d ? d.ds : "19/11") + "/2026",
+              horas: false,
+              das: "08:00",
+              as: "12:00",
+              tipo: null,
+              just: "",
+              err: "",
+            };
+            S.sheet = "abono";
+            S.menu = null;
+            S.drawer = false;
+            render();
+          },
+          abSet(k, v) {
+            S.ab[k] = v;
+            S.ab.err = "";
+            render();
+          },
+          submitAbono() {
+            const b = S.ab;
+            if (!b.tipo) {
+              b.err = "Escolha o motivo do abono.";
+              return render();
+            }
+            if (b.tipo === "Outro" && !b.just.trim()) {
+              b.err = "Escreva a justificativa para enviar.";
+              return render();
+            }
+            pushReq("Abono", b.tipo + " · " + b.data.slice(0, 5));
+            S.sheet = null;
+            A.toast("Abono solicitado. Você será avisado da análise.");
+          },
+          openReqs() {
+            S.sheet = "reqs";
+            S.drawer = false;
+            S.menu = null;
+            render();
+          },
+          openChooser() {
+            S.sheet = "nova";
+            S.drawer = false;
+            S.menu = null;
+            render();
+          },
+          choose(kind) {
+            S.pk = { kind };
+            S.sheet = "dia";
+            render();
+          },
+          pickDay(id) {
+            if (S.pk.kind === "add") return A.openInsert(id);
+            S.pk.day = id;
+            S.sheet = "batidas";
+            render();
+          },
+          newAt(dayId) {
+            const d = dayId ? dayOf(dayId) : null;
+            if (d && d.locked) return lockedMsg();
+            const dt = (d ? d.ds : "19/11") + "/2026";
+            S.at = {
+              ini: dt,
+              fim: dt,
+              multi: false,
+              obs: "",
+              files: [],
+              err: "",
+              edit: null,
+            };
+            A.go("enviar-atestado");
+          },
+          atSet(k, v) {
+            S.at[k] = v;
+            S.at.err = "";
+            render();
+          },
+          atFiles(list) {
+            const a = S.at,
+              errs = [];
+            for (const f of Array.from(list || [])) {
+              const e = (f.name.split(".").pop() || "").toLowerCase(),
+                x = e === "jpeg" ? "jpg" : e;
+              if (["jpg", "png", "pdf"].indexOf(x) < 0) {
+                errs.push(f.name + " não é JPG, PNG ou PDF.");
+                continue;
+              }
+              if (f.size > MAXB) {
+                errs.push(f.name + " tem mais de 10 MB.");
+                continue;
+              }
+              if (a.files.length >= MAXF) {
+                errs.push("Limite de " + MAXF + " anexos por atestado.");
+                break;
+              }
+              a.files.push({ n: f.name, size: f.size, x, file: f });
+            }
+            a.err = errs.join(" ");
+            render();
+          },
+          atRm(i) {
+            S.at.files.splice(i, 1);
+            S.at.err = "";
+            render();
+          },
+          dlForm(i) {
+            dlFile(S.at.files[i]);
+          },
+          dl(id, i) {
+            const a = S.ats.find((x) => x.id === id);
+            if (a) dlFile(a.files[i]);
+          },
+          atSubmit() {
+            const a = S.at;
+            if (!a.files.length) {
+              a.err = "Anexe pelo menos um arquivo do atestado para enviar.";
+              return render();
+            }
+            if (!toD(a.ini) || (a.multi && !toD(a.fim))) {
+              a.err = "Informe as datas no formato dd/mm/aaaa.";
+              return render();
+            }
+            const multi = a.multi && a.fim !== a.ini,
+              per = multi
+                ? a.ini.slice(0, 5) + " a " + a.fim.slice(0, 5)
+                : a.ini.slice(0, 5),
+              dias = multi
+                ? Math.max(1, Math.round((toD(a.fim) - toD(a.ini)) / 864e5) + 1)
+                : 1;
+            if (a.edit) {
+              const x = S.ats.find((z) => z.id === a.edit);
+              Object.assign(x, {
+                per,
+                dias,
+                obs: a.obs,
+                files: a.files.slice(),
+                sent: "Editado agora · em análise",
+              });
+              S.atSel = x.id;
+              S.atWasEdit = true;
+            } else {
+              const it = {
+                id: "a" + Date.now(),
+                per,
+                dias,
+                files: a.files.slice(),
+                s: "ana",
+                sent: "Enviado agora",
+                prazo: "24/11",
+                obs: a.obs,
+              };
+              S.ats.unshift(it);
+              S.atSel = it.id;
+              S.atWasEdit = false;
+              pushReq("Atestado", per);
+            }
+            S.atLast = { per, dias, n: a.files.length };
+            S.hist = ["inicio", "atestados"];
+            S.scr = "atestado-enviado";
+            clean();
+            setHash();
+            render();
+          },
+          openAt(id) {
+            A.go("atestado", { atSel: id });
+          },
+          editAt(id) {
+            const a = S.ats.find((x) => x.id === id),
+              pp = a.per.split(" a ");
+            S.at = {
+              ini: pp[0] + "/2026",
+              fim: (pp[1] || pp[0]) + "/2026",
+              multi: !!pp[1],
+              obs: a.obs || "",
+              files: a.files.slice(),
+              err: "",
+              edit: id,
+            };
+            A.go("enviar-atestado");
+          },
+          newFer(n) {
+            S.fer = {
+              ini: "04/01/2027",
+              dias: n || 10,
+              vender: false,
+              adiant: false,
+              err: "",
+            };
+            A.go("solicitar-ferias");
+          },
+          ferSet(k, v) {
+            S.fer[k] = v;
+            S.fer.err = "";
+            render();
+          },
+          ferSum() {
+            const e = $("#fer-sum");
+            if (e) e.innerHTML = ferSumH(S.fer);
+          },
+          ferSubmit() {
+            const f = S.fer,
+              sd = saldo(),
+              st = toD(f.ini),
+              fim = addDays(f.ini, f.dias - 1);
+            if (!st) {
+              f.err = "Informe o primeiro dia no formato dd/mm/aaaa.";
+              return render();
+            }
+            if (st <= TODAY) {
+              f.err = "Escolha uma data a partir de amanhã.";
+              return render();
+            }
+            if (f.dias + (f.vender ? 10 : 0) > sd) {
+              f.err =
+                "Você tem " +
+                dl(sd) +
+                " disponíveis" +
+                (f.vender ? ", contando os 10 dias vendidos" : "") +
+                ". Escolha um período menor.";
+              return render();
+            }
+            for (let k = 1; k <= 2; k++) {
+              const x = new Date(st);
+              x.setDate(x.getDate() + k);
+              if (x.getDay() === 0 || HOL.indexOf(fromD(x).slice(0, 5)) >= 0) {
+                f.err =
+                  "As férias não podem começar nos 2 dias antes de feriado ou do descanso semanal. Escolha outra data.";
+                return render();
+              }
+            }
+            const it = {
+              id: "f" + Date.now(),
+              ini: f.ini,
+              fim,
+              dias: f.dias,
+              s: "ana",
+              sent: "Enviada agora",
+              vender: f.vender,
+              adiant: f.adiant,
+            };
+            S.fers.unshift(it);
+            S.ferSel = it.id;
+            S.ferLast = it;
+            pushReq("Férias", f.ini.slice(0, 5) + " a " + fim.slice(0, 5));
+            S.hist = ["inicio", "ferias"];
+            S.scr = "ferias-enviada";
+            clean();
+            setHash();
+            render();
+          },
+          openFer(id) {
+            A.go("ferias-detalhe", { ferSel: id });
+          },
+          ferDoc(k) {
+            const f = curFer();
+            dlFile({
+              n:
+                k + "_ferias_" + f.ini.slice(0, 2) + f.ini.slice(3, 5) + ".pdf",
+              x: "pdf",
+            });
+          },
+          pref(k, v) {
+            S.prefs[k] = v;
+          },
+          jump(k) {
+            S.comp = null;
+            S.pLoading = false;
+            S.toast = null;
+            clean();
+            (J[k] || J.inicio)();
+          },
+        });
+
+        /* ---------- índice de telas ---------- */
+        const J = {
+          entrar: () => A.logout(),
+          inicio: () => A.tab("inicio"),
+          notificacoes: () => {
+            A.tab("inicio");
+            A.go("notificacoes");
+          },
+          menu: () => {
+            A.tab("inicio");
+            A.openDrawer();
+          },
+          registrar: () => {
+            A.tab("inicio");
+            A.openPonto();
+          },
+          comprovante: () => {
+            A.tab("inicio");
+            S.comp = { tipo: "Saída", t: "17:03", nsr: "000185" };
+            render();
+          },
+          ponto: () => A.tab("ponto"),
+          filtros: () => {
+            A.tab("ponto");
+            A.openFilter();
+          },
+          "menu-batida": () => {
+            A.tab("ponto");
+            A.rowMenu("19c");
+          },
+          "menu-dia": () => {
+            A.tab("ponto");
+            A.dayMenu("19");
+          },
+          resumo: () => {
+            A.tab("ponto");
+            A.go("resumo-do-dia", { rday: "17" });
+          },
+          batida: () => {
+            A.tab("ponto");
+            A.detail("17a");
+          },
+          corrigir: () => {
+            A.tab("ponto");
+            A.openEdit("19c");
+          },
+          incluir: () => {
+            A.tab("ponto");
+            A.openInsert("19");
+          },
+          abono: () => {
+            A.tab("ponto");
+            A.openAbono("19");
+          },
+          solicitacoes: () => {
+            A.tab("ponto");
+            A.openReqs();
+          },
+          nova: () => {
+            A.tab("ponto");
+            A.openChooser();
+          },
+          atestados: () => {
+            A.tab("inicio");
+            A.go("atestados");
+          },
+          "enviar-atestado": () => {
+            A.tab("inicio");
+            A.go("atestados");
+            A.newAt();
+          },
+          "atestado-erro": () => {
+            A.tab("inicio");
+            A.go("atestados");
+            A.newAt();
+            A.atSubmit();
+          },
+          "atestado-anexos": () => {
+            A.tab("inicio");
+            A.go("atestados");
+            A.editAt("a3");
+          },
+          "atestado-enviado": () => {
+            S.atLast = { per: "03/11", dias: 1, n: 2 };
+            S.atWasEdit = false;
+            A.rep("atestado-enviado");
+            S.hist = ["inicio", "atestados"];
+          },
+          atestado: () => {
+            A.tab("inicio");
+            A.go("atestados");
+            A.openAt("a1");
+          },
+          "atestado-recusado": () => {
+            A.tab("inicio");
+            A.go("atestados");
+            A.openAt("a2");
+          },
+          ferias: () => {
+            A.tab("inicio");
+            A.go("ferias");
+          },
+          "solicitar-ferias": () => {
+            A.tab("inicio");
+            A.go("ferias");
+            A.newFer();
+          },
+          "ferias-erro": () => {
+            A.tab("inicio");
+            A.go("ferias");
+            A.newFer(30);
+            A.ferSubmit();
+          },
+          "ferias-enviada": () => {
+            S.ferLast = { ini: "04/01/2027", fim: "13/01/2027", dias: 10 };
+            A.rep("ferias-enviada");
+            S.hist = ["inicio", "ferias"];
+          },
+          "ferias-detalhe": () => {
+            A.tab("inicio");
+            A.go("ferias");
+            A.openFer("f1");
+          },
+          "ferias-recusada": () => {
+            A.tab("inicio");
+            A.go("ferias");
+            A.openFer("fr");
+          },
+          perfil: () => A.tab("perfil"),
+        };
+        const IDX = [
+          ["Acesso", [["entrar", "Entrar"]]],
+          [
+            "Início",
+            [
+              ["inicio", "Início"],
+              ["notificacoes", "Notificações"],
+              ["menu", "Menu lateral"],
+              ["registrar", "Registrar ponto"],
+              ["comprovante", "Comprovante"],
+            ],
+          ],
+          [
+            "Ponto",
+            [
+              ["ponto", "Batidas"],
+              ["filtros", "Filtros"],
+              ["menu-batida", "Menu da batida"],
+              ["menu-dia", "Menu do dia"],
+              ["resumo", "Resumo do dia"],
+              ["batida", "Detalhes da batida"],
+              ["corrigir", "Corrigir batida"],
+              ["incluir", "Incluir batida"],
+              ["abono", "Solicitar abono"],
+              ["solicitacoes", "Minhas solicitações"],
+              ["nova", "Nova solicitação"],
+            ],
+          ],
+          [
+            "Atestados médicos",
+            [
+              ["atestados", "Lista"],
+              ["enviar-atestado", "Enviar"],
+              ["atestado-anexos", "Vários anexos"],
+              ["atestado-erro", "Envio sem anexo"],
+              ["atestado-enviado", "Enviado"],
+              ["atestado", "Aprovado"],
+              ["atestado-recusado", "Recusado"],
+            ],
+          ],
+          [
+            "Férias",
+            [
+              ["ferias", "Visão geral"],
+              ["solicitar-ferias", "Solicitar"],
+              ["ferias-erro", "Acima do saldo"],
+              ["ferias-enviada", "Solicitada"],
+              ["ferias-detalhe", "Aprovadas"],
+              ["ferias-recusada", "Recusadas"],
+            ],
+          ],
+          ["Conta", [["perfil", "Perfil"]]],
+        ];
+        $("#idx").innerHTML = IDX.map(
+          (g) =>
+            '<div class="grp"><h2>' +
+            g[0] +
+            "</h2><div>" +
+            g[1]
+              .map(
+                (x) =>
+                  '<button class="jb" type="button" data-k="' +
+                  x[0] +
+                  '">' +
+                  x[1] +
+                  "</button>"
+              )
+              .join("") +
+            "</div></div>"
+        ).join("");
+        $("#idx").addEventListener("click", (e) => {
+          const b = e.target.closest("[data-k]");
+          if (b) A.jump(b.dataset.k);
+        });
+        $("#wm").innerHTML = logo(30) + "<span>Single</span>";
+        $("#reset").addEventListener("click", () => {
+          S = init();
+          lastScr = null;
+          setHash();
+          render();
+        });
+        function curKey() {
+          if (S.comp) return "comprovante";
+          if (S.drawer) return "menu";
+          const sh = {
+            ponto: "registrar",
+            filtros: "filtros",
+            dia_menu: "menu-dia",
+            abono: "abono",
+            reqs: "solicitacoes",
+            nova: "nova",
+          };
+          if (S.sheet === "edit")
+            return S.ed && S.ed.row ? "corrigir" : "incluir";
+          if (sh[S.sheet]) return sh[S.sheet];
+          if (S.menu && S.scr === "ponto") return "menu-batida";
+          const m = {
+            "resumo-do-dia": "resumo",
+            atestado: curAt().s === "rec" ? "atestado-recusado" : "atestado",
+            "ferias-detalhe":
+              curFer().s === "rec" ? "ferias-recusada" : "ferias-detalhe",
+            "enviar-atestado":
+              S.at && S.at.err && !S.at.files.length
+                ? "atestado-erro"
+                : S.at && S.at.edit
+                ? "atestado-anexos"
+                : "enviar-atestado",
+            "solicitar-ferias":
+              S.fer && S.fer.err ? "ferias-erro" : "solicitar-ferias",
+          };
+          return m[S.scr] || S.scr;
+        }
+        function syncIdx() {
+          const k = curKey();
+          document.querySelectorAll(".jb").forEach((b) => {
+            const on = b.dataset.k === k;
+            b.classList.toggle("on", on);
+            if (on) b.setAttribute("aria-current", "true");
+            else b.removeAttribute("aria-current");
+          });
+        }
+
+        window.addEventListener("hashchange", () => {
+          const h = location.hash.slice(1);
+          if (SCR[h] && h !== S.scr) {
+            if (h === "enviar-atestado" && !S.at)
+              S.at = {
+                ini: "19/11/2026",
+                fim: "19/11/2026",
+                multi: false,
+                obs: "",
+                files: [],
+                err: "",
+                edit: null,
+              };
+            if (h === "solicitar-ferias" && !S.fer)
+              S.fer = {
+                ini: "04/01/2027",
+                dias: 10,
+                vender: false,
+                adiant: false,
+                err: "",
+              };
+            S.scr = h;
+            S.comp = null;
+            clean();
+            render();
+          }
+        });
+        setInterval(() => {
+          if (running() && !S.comp) {
+            S.sec++;
+            const a = $("#tmhm"),
+              b = $("#tms");
+            if (a) {
+              a.textContent = hm(S.sec);
+              b.textContent = pad(S.sec % 60);
+            }
+          }
+        }, 1000);
+        {
+          const h = location.hash.slice(1);
+          if (SCR[h]) {
+            S.scr = h;
+            if (h === "enviar-atestado")
+              S.at = {
+                ini: "19/11/2026",
+                fim: "19/11/2026",
+                multi: false,
+                obs: "",
+                files: [],
+                err: "",
+                edit: null,
+              };
+            if (h === "solicitar-ferias")
+              S.fer = {
+                ini: "04/01/2027",
+                dias: 10,
+                vender: false,
+                adiant: false,
+                err: "",
+              };
+          }
+        }
+        render();
+      }
+    </script>
+  </body>
+</html>
